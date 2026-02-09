@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Borne
+Comment=
+Exec=/usr/bin/lxterminal -e bash -lc 'cd "$HOME/git/borne_arcade"; NO_SHUTDOWN=1 ./lancerBorne.sh'
+Icon=gtk-dialog-authentication
+NotShowIn=GNOME;KDE;
+Hidden=false
+Terminal=true
+X-KeepTerminal=false

@@ -1,0 +1,12 @@
+[Unit]
+Description=Borne Arcade - Menu
+
+[Service]
+Type=simple
+WorkingDirectory=%h/git/borne_arcade
+ExecStart=%h/git/borne_arcade/scripts/run-menu.sh
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=default.target

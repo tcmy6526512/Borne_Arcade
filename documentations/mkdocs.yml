@@ -1,0 +1,19 @@
+site_name: Borne Arcade (IUT) — Documentation
+site_description: Documentation technique, installation, utilisateur, ajout de jeu, déploiement.
+
+# All docs live in this folder as requested.
+docs_dir: .
+site_dir: site
+
+theme:
+  name: readthedocs
+
+nav:
+  - Accueil: index.md
+  - Installation: installation.md
+  - Utilisateur: utilisateur.md
+  - Ajouter un jeu: ajout-jeu.md
+  - Technique: technique.md
+  - Déploiement & mises à jour: deploiement.md
+  - Tests sur VM Ubuntu: tests-vm.md
+  - Upgrade Raspberry Pi OS: upgrade-raspi-os.md

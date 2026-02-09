@@ -1,0 +1,3 @@
+Mini-jeu de test pour valider l'integration
+Deplacer le carre rouge avec le joystick J1
+Quitter avec le bouton Z (J1)
