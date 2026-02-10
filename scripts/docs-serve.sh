@@ -10,5 +10,5 @@ python -m pip install --upgrade pip setuptools wheel
 
 # Avoid building from source on i386 images.
 pip install --only-binary=:all: MarkupSafe==3.0.0
-pip install --only-binary=:all: -r documentations/requirements.txt
+pip install -r documentations/requirements.txt
 mkdocs serve -f documentations/mkdocs.yml -a 127.0.0.1:8000
