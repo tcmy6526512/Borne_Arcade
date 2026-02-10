@@ -1,5 +1,5 @@
 mkdocs==1.6.1
 
-# Debian 11 / Bullseye i386: MarkupSafe 3.x may require building from source
-# and can fail with older build tooling. Pin to a widely wheel-available version.
-MarkupSafe==2.1.5
+# Raspberry Pi Desktop / Bullseye i386: MarkupSafe often has no compiled wheels for i686.
+# Pin to a release that ships a universal (py3-none-any) wheel to avoid building from source.
+MarkupSafe==3.0.0
