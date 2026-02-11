@@ -22,4 +22,4 @@ DOCS_PORT="${DOCS_PORT:-8000}"
 echo "Docs: http://${DOCS_HOST}:${DOCS_PORT}/"
 echo "Running: mkdocs serve -f documentations/mkdocs.yml -a ${DOCS_HOST}:${DOCS_PORT}"
 
-mkdocs serve -f documentations/mkdocs.yml -a "${DOCS_HOST}:${DOCS_PORT}"
+python -m mkdocs serve -f documentations/mkdocs.yml -a "${DOCS_HOST}:${DOCS_PORT}"

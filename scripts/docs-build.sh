@@ -11,6 +11,6 @@ python -m pip install --upgrade pip setuptools wheel
 # Avoid building from source on i386 images.
 pip install --only-binary=:all: MarkupSafe==3.0.0
 pip install -r documentations/requirements.txt
-mkdocs build -f documentations/mkdocs.yml
+python -m mkdocs build -f documentations/mkdocs.yml
 
 echo "Docs générées dans documentations/site/"
