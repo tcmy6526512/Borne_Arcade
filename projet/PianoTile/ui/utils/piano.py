@@ -1,4 +1,4 @@
-import pygame, librosa, random
+import pygame, random
 from ui.utils.note import Note
 
 class Piano:
@@ -26,19 +26,20 @@ class Piano:
         print("Génération des notes à partir du fichier :", self.__filepath)
         notes = []
 
-        # Charger le fichier en mono, à faible sample rate (optimisation mémoire)
-        y, sr = librosa.load(self.__filepath, sr=22050, mono=True)
+        # Fallback sans librosa: on génère des notes à intervalle régulier.
+        # C'est moins précis qu'une détection de beat, mais le jeu reste jouable
+        # sur les environnements Linux où librosa/numba est difficile à installer.
+        temps = 0.8
+        intervalle = 0.45
+        duree_estimee = 120.0
 
-        # Analyse du rythme
-        tempo, beat_frames = librosa.beat.beat_track(y=y, sr=sr)
-        beat_times = librosa.frames_to_time(beat_frames, sr=sr)
-
-        for time in beat_times:
-            nb_notes = min(self.__difficulty, random.randint(1, 4))
+        while temps < duree_estimee:
+            nb_notes = min(self.__difficulty, random.randint(1, 2))
             for _ in range(nb_notes):
                 position = random.choice(["left", "middle", "right", "top"])
-                note = Note(gameview=self.__gameView, position=position, timestamp=time)
+                note = Note(gameview=self.__gameView, position=position, timestamp=temps)
                 notes.append(note)
+            temps += intervalle
 
         print(f"{len(notes)} notes générées.")
         return notes

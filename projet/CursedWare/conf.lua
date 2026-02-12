@@ -7,4 +7,5 @@ function love.conf(t)
 	t.modules.touch = false
 	t.modules.physic = false
 	t.modules.thread = false
+	t.modules.math = false
 end
