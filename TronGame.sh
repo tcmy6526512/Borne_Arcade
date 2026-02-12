@@ -1,2 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
 cd projet/TronGame
-python3.7 main.py
+python3 main.py

@@ -1,2 +1,6 @@
+#!/bin/bash
+set -euo pipefail
+
+cd "$(dirname "$0")"
 cd projet/ball-blast
-python3.7 ./src
+python3 -m src
