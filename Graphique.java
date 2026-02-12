@@ -120,28 +120,36 @@ public class Graphique {
 	}
 	
 	/*Musique de fond*/
-	//Comptage du nombre de musiques disponibles
+	// Comptage du nombre de musiques disponibles
 	Path cheminMusiques = FileSystems.getDefault().getPath("sound/bg/");
-	cptMus=0;
-	try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(cheminMusiques)) {
-	    for (Path path : directoryStream) {
-		cptMus++;
+	cptMus = 0;
+	if (Files.isDirectory(cheminMusiques)) {
+	    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(cheminMusiques)) {
+		for (Path path : directoryStream) {
+		    cptMus++;
+		}
+	    } catch (IOException e) {
+		e.printStackTrace();
 	    }
-	} catch (IOException e) {
-	    e.printStackTrace();
+	} else {
+	    System.err.println("Dossier musique introuvable: sound/bg");
 	}
-	//Creation d'un tableau de musiques
+
+	// Creation d'un tableau de musiques
 	tableauMusiques = new String[cptMus];
-	try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(cheminMusiques)) {
-	    int i = cptMus-1;
-	    for (Path path : directoryStream) {
-		tableauMusiques[i]=path.getFileName().toString();
-		i--;
+	if (cptMus > 0 && Files.isDirectory(cheminMusiques)) {
+	    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(cheminMusiques)) {
+		int i = cptMus - 1;
+		for (Path path : directoryStream) {
+		    tableauMusiques[i] = path.getFileName().toString();
+		    i--;
+		}
+	    } catch (IOException e) {
+		e.printStackTrace();
 	    }
-	} catch (IOException e) {
-	    e.printStackTrace();
 	}
-	//Choix d'une musique aleatoire et lecture de celle-ci
+
+	// Choix d'une musique aleatoire et lecture de celle-ci
 	this.lectureMusiqueFond();
     }
 
@@ -269,12 +277,15 @@ public class Graphique {
     }
     
     public static void lectureMusiqueFond() {
-    	musiqueFond = new Bruitage ("sound/bg/"+tableauMusiques[(int)(Math.random()*cptMus)]);
-    	musiqueFond.lecture();
+	    if (cptMus <= 0 || tableauMusiques == null)
+		return;
+	    musiqueFond = new Bruitage("sound/bg/" + tableauMusiques[(int)(Math.random() * cptMus)]);
+	    musiqueFond.lecture();
     }
 	
 	public static void stopMusiqueFond(){
-		musiqueFond.arret();
+		if (musiqueFond != null)
+			musiqueFond.arret();
 	}
 	
 	public static void afficherTexte(int valeur){
