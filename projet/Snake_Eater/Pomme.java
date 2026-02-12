@@ -1,6 +1,6 @@
 import MG2D.geometrie.Carre;
 import MG2D.geometrie.Point;
-import MG2D.geometrie.Couleur;
+import MG2D.Couleur;
 
 
 // crée une pomme

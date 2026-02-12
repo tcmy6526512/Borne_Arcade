@@ -41,7 +41,9 @@ git clone <URL_DE_TON_DEPOT> borne_arcade
 
 Le menu Java dépend de la bibliothèque **MG2D** (`import MG2D.*`).
 
-Historique : la doc minimale pointe vers `https://github.com/synave/MG2D`.
+Note : ce dépôt utilise très largement `MG2D.geometrie.Couleur` (NOIR, BLANC, etc.). Si tu clones une version de MG2D qui ne fournit pas cette classe, la compilation échouera.
+
+Mise à jour : la version GitHub de MG2D place généralement `Couleur` dans le package `MG2D` (ex: `MG2D/Couleur.java`). Le code de ce dépôt a été adapté en conséquence (imports `MG2D.Couleur`). Si tu as une erreur de compilation sur `MG2D.geometrie.Couleur`, commence par faire un `git pull` sur `borne_arcade`.
 
 Deux stratégies possibles :
 1. **Cloner MG2D à côté du dépôt** (recommandé pour rester proche de l'existant).
@@ -57,6 +59,11 @@ git clone https://github.com/synave/MG2D.git
 Tu dois alors avoir :
 - `~/git/borne_arcade`
 - `~/git/MG2D`
+
+Si `./compilation.sh` échoue avec `cannot find symbol: class Couleur` :
+- fais d'abord `git pull` dans `~/git/borne_arcade` (pour récupérer les imports compatibles GitHub)
+- vérifie ensuite que `Couleur.java` existe : `find ~/git/MG2D -name Couleur.java`
+- si vraiment ta MG2D ne fournit pas `Couleur`, essaye une autre version (ex: miroir GitLab IUT si accessible)
 
 ## Installer le layout clavier “borne” (optionnel mais conseillé)
 

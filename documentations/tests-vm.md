@@ -35,6 +35,16 @@ git clone <URL_DE_TON_DEPOT> borne_arcade
 git clone https://github.com/synave/MG2D.git
 ```
 
+Si la compilation échoue avec `MG2D.geometrie.Couleur` manquant :
+- fais d'abord `git pull` dans `~/git/borne_arcade`
+- puis relance `./compilation.sh`
+
+En dernier recours (si ta version MG2D ne fournit pas `Couleur`), tu peux essayer le miroir GitLab IUT :
+```bash
+rm -rf ~/git/MG2D
+git clone http://iut.univ-littoral.fr/gitlab/synave/MG2D.git
+```
+
 ## 5) Installer le layout clavier “borne”
 
 ```bash
