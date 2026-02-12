@@ -1,6 +1,7 @@
 import MG2D.Fenetre;
 import MG2D.geometrie.*;
 import MG2D.geometrie.Point;
+import MG2D.Couleur;
 
 import java.awt.Font;
 import java.io.InputStream;
