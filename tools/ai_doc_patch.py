@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import importlib.util
 import json
 import os
 import pathlib
@@ -50,13 +51,38 @@ def call_ollama(model: str, prompt: str, host: str) -> str:
     return data.get("response", "")
 
 
+def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str) -> str:
+    wrapper_path = os.getenv("OLLAMA_WRAPPER_PATH", "tools/ollama_wrapper_iut.py")
+    path = pathlib.Path(wrapper_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Wrapper introuvable: {wrapper_path}")
+
+    spec = importlib.util.spec_from_file_location("ollama_wrapper_iut", str(path))
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Impossible de charger le wrapper: {wrapper_path}")
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    if not hasattr(module, "OllamaWrapper"):
+        raise RuntimeError("Le wrapper ne contient pas la classe OllamaWrapper")
+
+    wrapper = module.OllamaWrapper(base_url=host)
+    result = wrapper.generate_text(model=model, prompt=prompt)
+    response = getattr(result, "response", None)
+    if not isinstance(response, str):
+        raise RuntimeError("Réponse invalide du wrapper Ollama")
+    return response
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Génère une proposition de mise à jour de doc via Ollama.")
     parser.add_argument("--diff", required=True, help="Chemin vers un fichier diff (git diff).")
     parser.add_argument("--docs-dir", default="documentations", help="Dossier docs markdown.")
     parser.add_argument("--output", default="documentations/ia-suggestions.md", help="Fichier de sortie markdown.")
     parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "llama3.1"), help="Modèle Ollama")
-    parser.add_argument("--host", default=os.getenv("OLLAMA_HOST", "http://127.0.0.1:11434"), help="URL Ollama")
+    parser.add_argument("--host", default=os.getenv("OLLAMA_HOST", "http://10.22.28.190:11434"), help="URL Ollama")
+    parser.add_argument("--use-wrapper", action="store_true", help="Utiliser tools/ollama_wrapper_iut.py")
     args = parser.parse_args()
 
     diff_path = pathlib.Path(args.diff)
@@ -101,13 +127,16 @@ def main() -> int:
     ).strip()
 
     try:
-        response = call_ollama(args.model, prompt, args.host)
+        if args.use_wrapper or os.getenv("OLLAMA_USE_WRAPPER", "1") == "1":
+            response = call_ollama_with_iut_wrapper(args.model, prompt, args.host)
+        else:
+            response = call_ollama(args.model, prompt, args.host)
     except Exception as exc:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(
             "# Suggestions IA (Ollama)\n\n"
             f"Erreur d'appel Ollama: {exc}\n\n"
-            "Vérifie que le service est lancé (`ollama serve`) et que le modèle est disponible.\n",
+            "Vérifie que tu es sur le Wi-Fi IUT et que OLLAMA_HOST/OLLAMA_WRAPPER_PATH sont corrects.\n",
             encoding="utf-8",
         )
         print(f"[ai-doc] Erreur Ollama, rapport d'erreur écrit: {output_path}")

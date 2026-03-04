@@ -11,12 +11,8 @@ Objectif: proposer des mises à jour de documentation à partir des changements 
 ## Pré-requis
 
 - Python 3 installé
-- Ollama installé et lancé (`ollama serve`)
-- Un modèle disponible (exemple):
-
-```bash
-ollama pull llama3.1
-```
+- Accès réseau au serveur Ollama de l'IUT (Wi-Fi IUT)
+- Wrapper présent dans le dépôt: `tools/ollama_wrapper_iut.py`
 
 ## Générer une proposition de doc
 
@@ -26,6 +22,12 @@ Depuis la racine du dépôt:
 chmod +x scripts/docs-ai.sh
 bash scripts/docs-ai.sh
 ```
+
+Le script utilise par défaut:
+
+- `OLLAMA_USE_WRAPPER=1`
+- `OLLAMA_WRAPPER_PATH=tools/ollama_wrapper_iut.py`
+- `OLLAMA_HOST=http://10.22.28.190:11434`
 
 Par défaut, le script compare `HEAD~1...HEAD`.
 
@@ -50,13 +52,25 @@ Ce fichier contient:
 
 ## Variables utiles
 
-- `OLLAMA_HOST` (défaut: `http://127.0.0.1:11434`)
+- `OLLAMA_HOST` (défaut: `http://10.22.28.190:11434`)
 - `OLLAMA_MODEL` (défaut: `llama3.1`)
+- `OLLAMA_USE_WRAPPER` (défaut: `1`)
+- `OLLAMA_WRAPPER_PATH` (défaut: `tools/ollama_wrapper_iut.py`)
 
 Exemple:
 
 ```bash
-OLLAMA_MODEL=mistral OLLAMA_HOST=http://127.0.0.1:11434 bash scripts/docs-ai.sh
+OLLAMA_MODEL=llama3.1 OLLAMA_HOST=http://10.22.28.190:11434 bash scripts/docs-ai.sh
+```
+
+## Diagnostic rapide
+
+- Si tu n'es pas connecté au Wi-Fi IUT: l'appel échoue.
+- Le détail de l'erreur est écrit dans `documentations/ia-suggestions.md`.
+- Test réseau simple:
+
+```bash
+curl -fsS http://10.22.28.190:11434/api/version
 ```
 
 ## Workflow conseillé
