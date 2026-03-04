@@ -10,10 +10,12 @@ OLLAMA_HOST="${OLLAMA_HOST:-http://10.22.28.190:11434}"
 OLLAMA_MODEL="${OLLAMA_MODEL:-llama3.1}"
 OLLAMA_USE_WRAPPER="${OLLAMA_USE_WRAPPER:-1}"
 OLLAMA_WRAPPER_PATH="${OLLAMA_WRAPPER_PATH:-tools/ollama_wrapper_iut.py}"
+OLLAMA_TIMEOUT_S="${OLLAMA_TIMEOUT_S:-240}"
 
 echo "[docs-ai] Host Ollama: ${OLLAMA_HOST}"
 echo "[docs-ai] Modèle Ollama: ${OLLAMA_MODEL}"
 echo "[docs-ai] Wrapper IUT: ${OLLAMA_USE_WRAPPER} (${OLLAMA_WRAPPER_PATH})"
+echo "[docs-ai] Timeout: ${OLLAMA_TIMEOUT_S}s"
 
 if ! command -v python3 >/dev/null 2>&1; then
   echo "[docs-ai] Erreur: python3 introuvable." >&2
@@ -42,6 +44,7 @@ python3 ./tools/ai_doc_patch.py \
   --output "${OUTPUT_FILE}" \
   --model "${OLLAMA_MODEL}" \
   --host "${OLLAMA_HOST}" \
+  --timeout "${OLLAMA_TIMEOUT_S}" \
   --use-wrapper
 RC=$?
 set -e

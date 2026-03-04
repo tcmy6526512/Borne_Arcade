@@ -16,7 +16,7 @@ def read_text(path: pathlib.Path) -> str:
     return path.read_text(encoding="utf-8", errors="replace")
 
 
-def collect_docs_snapshot(docs_dir: pathlib.Path, max_files: int = 8, max_chars_per_file: int = 2500) -> str:
+def collect_docs_snapshot(docs_dir: pathlib.Path, max_files: int = 6, max_chars_per_file: int = 1400) -> str:
     if not docs_dir.exists():
         return "(docs_dir introuvable)"
 
@@ -28,7 +28,7 @@ def collect_docs_snapshot(docs_dir: pathlib.Path, max_files: int = 8, max_chars_
     return "\n\n".join(chunks) if chunks else "(aucun fichier markdown détecté)"
 
 
-def call_ollama(model: str, prompt: str, host: str) -> str:
+def call_ollama(model: str, prompt: str, host: str, timeout_s: float) -> str:
     body = json.dumps(
         {
             "model": model,
@@ -47,7 +47,7 @@ def call_ollama(model: str, prompt: str, host: str) -> str:
         method="POST",
     )
 
-    with urllib.request.urlopen(req, timeout=120) as resp:
+    with urllib.request.urlopen(req, timeout=timeout_s) as resp:
         data = json.loads(resp.read().decode("utf-8", errors="replace"))
     return data.get("response", "")
 
@@ -90,7 +90,7 @@ def pick_generation_model(preferred: str, available_models: list[str]) -> str:
     return candidates[0]
 
 
-def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str) -> str:
+def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str, timeout_s: float) -> str:
     wrapper_path = os.getenv("OLLAMA_WRAPPER_PATH", "tools/ollama_wrapper_iut.py")
     path = pathlib.Path(wrapper_path)
     if not path.exists():
@@ -107,7 +107,7 @@ def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str) -> str:
     if not hasattr(module, "OllamaWrapper"):
         raise RuntimeError("Le wrapper ne contient pas la classe OllamaWrapper")
 
-    wrapper = module.OllamaWrapper(base_url=host)
+    wrapper = module.OllamaWrapper(base_url=host, timeout_s=timeout_s)
     result = wrapper.generate_text(model=model, prompt=prompt)
     response = getattr(result, "response", None)
     if not isinstance(response, str):
@@ -123,6 +123,7 @@ def main() -> int:
     parser.add_argument("--model", default=os.getenv("OLLAMA_MODEL", "llama3.1"), help="Modèle Ollama")
     parser.add_argument("--host", default=os.getenv("OLLAMA_HOST", "http://10.22.28.190:11434"), help="URL Ollama")
     parser.add_argument("--use-wrapper", action="store_true", help="Utiliser tools/ollama_wrapper_iut.py")
+    parser.add_argument("--timeout", type=float, default=float(os.getenv("OLLAMA_TIMEOUT_S", "240")), help="Timeout réseau en secondes")
     args = parser.parse_args()
 
     diff_path = pathlib.Path(args.diff)
@@ -156,12 +157,12 @@ def main() -> int:
 
         Diff de code:
         ---
-        {diff[:50000]}
+        {diff[:12000]}
         ---
 
         Extraits docs actuels:
         ---
-        {docs_snapshot[:20000]}
+        {docs_snapshot[:8000]}
         ---
         """
     ).strip()
@@ -178,9 +179,9 @@ def main() -> int:
 
     try:
         if args.use_wrapper or os.getenv("OLLAMA_USE_WRAPPER", "1") == "1":
-            response = call_ollama_with_iut_wrapper(selected_model, prompt, args.host)
+            response = call_ollama_with_iut_wrapper(selected_model, prompt, args.host, args.timeout)
         else:
-            response = call_ollama(selected_model, prompt, args.host)
+            response = call_ollama(selected_model, prompt, args.host, args.timeout)
     except Exception as exc:
         extra = ""
         if available_models:
