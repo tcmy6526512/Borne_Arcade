@@ -15,5 +15,6 @@ nav:
   - Ajouter un jeu: ajout-jeu.md
   - Technique: technique.md
   - Déploiement & mises à jour: deploiement.md
+  - Automatisation doc (Ollama): automation-doc-ollama.md
   - Tests sur VM Ubuntu: tests-vm.md
   - Upgrade Raspberry Pi OS: upgrade-raspi-os.md
