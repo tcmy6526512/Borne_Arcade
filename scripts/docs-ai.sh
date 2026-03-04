@@ -25,6 +25,8 @@ if command -v curl >/dev/null 2>&1; then
     echo "[docs-ai] Avertissement: Ollama semble indisponible sur ${OLLAMA_HOST}." >&2
     echo "[docs-ai] Vérifie le Wi-Fi IUT et l'adresse OLLAMA_HOST." >&2
   fi
+  echo "[docs-ai] Modèles disponibles (serveur):"
+  curl -fsS "${OLLAMA_HOST}/api/tags" | python3 -c 'import sys,json;d=json.load(sys.stdin);print(" - " + "\n - ".join([m.get("name","") for m in d.get("models",[]) if m.get("name")]))' 2>/dev/null || true
 fi
 
 if [ "${BASE_REF}" = "--working-tree" ]; then

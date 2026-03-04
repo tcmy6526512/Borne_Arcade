@@ -7,6 +7,7 @@ import pathlib
 import sys
 import textwrap
 import urllib.request
+import urllib.error
 
 
 def read_text(path: pathlib.Path) -> str:
@@ -49,6 +50,22 @@ def call_ollama(model: str, prompt: str, host: str) -> str:
     with urllib.request.urlopen(req, timeout=120) as resp:
         data = json.loads(resp.read().decode("utf-8", errors="replace"))
     return data.get("response", "")
+
+
+def list_models(host: str) -> list[str]:
+    req = urllib.request.Request(
+        f"{host.rstrip('/')}/api/tags",
+        headers={"Accept": "application/json"},
+        method="GET",
+    )
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        payload = json.loads(resp.read().decode("utf-8", errors="replace"))
+    models = payload.get("models", []) if isinstance(payload, dict) else []
+    names = []
+    for item in models:
+        if isinstance(item, dict) and isinstance(item.get("name"), str):
+            names.append(item["name"])
+    return names
 
 
 def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str) -> str:
@@ -127,17 +144,32 @@ def main() -> int:
         """
     ).strip()
 
+    selected_model = args.model
+    try:
+        available_models = list_models(args.host)
+        if available_models and selected_model not in available_models:
+            fallback = available_models[0]
+            print(f"[ai-doc] Modèle '{selected_model}' introuvable, fallback auto -> '{fallback}'")
+            selected_model = fallback
+    except Exception:
+        available_models = []
+
     try:
         if args.use_wrapper or os.getenv("OLLAMA_USE_WRAPPER", "1") == "1":
-            response = call_ollama_with_iut_wrapper(args.model, prompt, args.host)
+            response = call_ollama_with_iut_wrapper(selected_model, prompt, args.host)
         else:
-            response = call_ollama(args.model, prompt, args.host)
+            response = call_ollama(selected_model, prompt, args.host)
     except Exception as exc:
+        extra = ""
+        if available_models:
+            extra = "\n\nModèles disponibles: " + ", ".join(available_models)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(
             "# Suggestions IA (Ollama)\n\n"
             f"Erreur d'appel Ollama: {exc}\n\n"
-            "Vérifie que tu es sur le Wi-Fi IUT et que OLLAMA_HOST/OLLAMA_WRAPPER_PATH sont corrects.\n",
+            "Vérifie que tu es sur le Wi-Fi IUT et que OLLAMA_HOST/OLLAMA_WRAPPER_PATH sont corrects."
+            + extra
+            + "\n",
             encoding="utf-8",
         )
         print(f"[ai-doc] Erreur Ollama, rapport d'erreur écrit: {output_path}")
