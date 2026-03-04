@@ -6,6 +6,23 @@ cd "$(dirname "$0")/.."
 BASE_REF="${1:-HEAD~1}"
 DIFF_FILE=".tmp-doc-diff.patch"
 OUTPUT_FILE="documentations/ia-suggestions.md"
+OLLAMA_HOST="${OLLAMA_HOST:-http://127.0.0.1:11434}"
+OLLAMA_MODEL="${OLLAMA_MODEL:-llama3.1}"
+
+echo "[docs-ai] Host Ollama: ${OLLAMA_HOST}"
+echo "[docs-ai] Modèle Ollama: ${OLLAMA_MODEL}"
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[docs-ai] Erreur: python3 introuvable." >&2
+  exit 1
+fi
+
+if command -v curl >/dev/null 2>&1; then
+  if ! curl -fsS "${OLLAMA_HOST}/api/tags" >/dev/null 2>&1; then
+    echo "[docs-ai] Avertissement: Ollama semble indisponible sur ${OLLAMA_HOST}." >&2
+    echo "[docs-ai] Vérifie: 'ollama serve' puis 'ollama pull ${OLLAMA_MODEL}'." >&2
+  fi
+fi
 
 if [ "${BASE_REF}" = "--working-tree" ]; then
   git diff > "${DIFF_FILE}"
@@ -13,11 +30,24 @@ else
   git diff "${BASE_REF}"...HEAD > "${DIFF_FILE}" || true
 fi
 
+set +e
 python3 ./tools/ai_doc_patch.py \
   --diff "${DIFF_FILE}" \
   --docs-dir "documentations" \
-  --output "${OUTPUT_FILE}"
+  --output "${OUTPUT_FILE}" \
+  --model "${OLLAMA_MODEL}" \
+  --host "${OLLAMA_HOST}"
+RC=$?
+set -e
 
 rm -f "${DIFF_FILE}"
+
+if [ ${RC} -ne 0 ]; then
+  echo "[docs-ai] Échec génération IA. Détails:"
+  if [ -f "${OUTPUT_FILE}" ]; then
+    sed -n '1,80p' "${OUTPUT_FILE}"
+  fi
+  exit ${RC}
+fi
 
 echo "[docs-ai] Terminé. Voir ${OUTPUT_FILE}"
