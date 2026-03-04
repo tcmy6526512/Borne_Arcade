@@ -19,7 +19,7 @@ class OllamaResponseError(OllamaError):
     pass
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class OllamaGenerateResult:
     response: str
     model: Optional[str] = None
