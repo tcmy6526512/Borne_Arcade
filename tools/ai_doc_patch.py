@@ -68,6 +68,28 @@ def list_models(host: str) -> list[str]:
     return names
 
 
+def pick_generation_model(preferred: str, available_models: list[str]) -> str:
+    if not available_models:
+        return preferred
+
+    def is_embedding(name: str) -> bool:
+        lowered = name.lower()
+        return "embed" in lowered or "embedding" in lowered
+
+    if preferred in available_models and not is_embedding(preferred):
+        return preferred
+
+    candidates = [m for m in available_models if not is_embedding(m)]
+    if not candidates:
+        return preferred
+
+    for good in ["qwen3:8b", "qwen2:latest", "gemma2:latest", "qwen2.5vl:7b"]:
+        if good in candidates:
+            return good
+
+    return candidates[0]
+
+
 def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str) -> str:
     wrapper_path = os.getenv("OLLAMA_WRAPPER_PATH", "tools/ollama_wrapper_iut.py")
     path = pathlib.Path(wrapper_path)
@@ -147,8 +169,8 @@ def main() -> int:
     selected_model = args.model
     try:
         available_models = list_models(args.host)
-        if available_models and selected_model not in available_models:
-            fallback = available_models[0]
+        fallback = pick_generation_model(selected_model, available_models)
+        if fallback != selected_model:
             print(f"[ai-doc] Modèle '{selected_model}' introuvable, fallback auto -> '{fallback}'")
             selected_model = fallback
     except Exception:
