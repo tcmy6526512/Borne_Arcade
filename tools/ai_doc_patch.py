@@ -62,6 +62,7 @@ def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str) -> str:
         raise RuntimeError(f"Impossible de charger le wrapper: {wrapper_path}")
 
     module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
     spec.loader.exec_module(module)
 
     if not hasattr(module, "OllamaWrapper"):
