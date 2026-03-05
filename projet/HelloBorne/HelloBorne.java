@@ -113,7 +113,11 @@ public class HelloBorne {
 
         ClavierBorneArcade clavier = new ClavierBorneArcade();
         f.addKeyListener(clavier);
-        f.getP().addKeyListener(clavier);
+        if (f.getP() != null) {
+            f.getP().addKeyListener(clavier);
+            f.getP().requestFocusInWindow();
+        }
+        f.requestFocus();
 
         Rectangle bg = solidRect(Couleur.GRIS_FONCE, 0, 0, LARGEUR, HAUTEUR);
         Rectangle road = solidRect(Couleur.NOIR, ROAD_LEFT, ROAD_BOTTOM, ROAD_RIGHT, ROAD_TOP);
@@ -143,6 +147,7 @@ public class HelloBorne {
         Texte levelTxt = new Texte(Couleur.BLANC, "Level: 1", font, new Point(640, 940));
         Texte helpTxt = new Texte(Couleur.GRIS_CLAIR, "J1 Gauche/Droite: voie | A: rejouer | Z: quitter", font, new Point(640, 40));
         Texte infoTxt = new Texte(Couleur.JAUNE, "", font, new Point(640, 520));
+        Texte bootTxt = new Texte(Couleur.ROUGE, "HELLOBORNE CHARGE", fontBig, new Point(640, 520));
 
         f.ajouter(bg);
         f.ajouter(road);
@@ -157,7 +162,16 @@ public class HelloBorne {
         f.ajouter(bestTxt);
         f.ajouter(levelTxt);
         f.ajouter(helpTxt);
+        f.ajouter(bootTxt);
         f.ajouter(infoTxt);
+        f.rafraichir();
+
+        try {
+            Thread.sleep(200);
+        } catch (InterruptedException e) {
+            System.err.println(e.getMessage());
+        }
+        f.supprimer(bootTxt);
         f.rafraichir();
 
         ArrayList<Obstacle> obstacles = new ArrayList<>();
