@@ -1,3 +1,6 @@
-Mini-jeu de test pour valider l'integration
-Deplacer le carre rouge avec le joystick J1
-Quitter avec le bouton Z (J1)
+Comet Rush : jeu de survie arcade
+Esquiver les blocs rouges le plus longtemps possible
+Le score augmente a chaque obstacle evite
+Le meilleur score est sauvegarde automatiquement
+Appuyer sur A pour rejouer apres un game over
+Appuyer sur Z pour revenir au menu borne

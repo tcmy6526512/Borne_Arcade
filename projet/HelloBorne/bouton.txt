@@ -1,1 +1,1 @@
-Deplacer:...:...:...:...:...:Quitter
+Bouger:Rejouer:...:...:...:...:Quitter
