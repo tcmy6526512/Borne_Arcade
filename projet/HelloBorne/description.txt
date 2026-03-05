@@ -1,7 +1,9 @@
-Dungeon Blitz : arena dungeon survival top-down
-Deplace ton heros avec le joystick J1 et esquive les vagues
-A : slash frontal rapide
-B : dash court pour se repositionner
-C : nova de zone (cooldown long)
-Le score augmente avec la survie et les ennemis elimines
+Dungeon Blitz : survive dans un donjon vivant
+Heros avec epee, monstres textures et ambiance dark fantasy
+Deplace toi librement au joystick J1 (8 directions)
+A : attaque epee longue portee
+B : dash d'esquive
+C : nova de zone
+Des structures (caisses/barils/sacs) bloquent les deplacements
+Le score augmente avec la survie et les monstres vaincus
 Z : quitter vers le menu borne
