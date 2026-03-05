@@ -222,8 +222,9 @@ public class HelloBorne {
                 mark.translater(0, -10);
                 if (mark.getB().getY() < 0) {
                     int h = mark.getB().getY() - mark.getA().getY();
-                    mark.setA(new Point(mark.getA().getX(), HAUTEUR + 1));
+                    // Meme contrainte MG2D: toujours definir B avant A pour eviter un etat temporaire invalide.
                     mark.setB(new Point(mark.getB().getX(), HAUTEUR + 1 + h));
+                    mark.setA(new Point(mark.getA().getX(), HAUTEUR + 1));
                 }
             }
 
