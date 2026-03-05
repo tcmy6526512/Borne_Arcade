@@ -1,1 +1,1 @@
-Voie gauche/droite:Rejouer:...:...:...:...:Quitter
+Deplacement 8 directions:Slash:Dash:Nova:...:...:Quitter

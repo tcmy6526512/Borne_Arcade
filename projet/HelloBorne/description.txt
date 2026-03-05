@@ -1,6 +1,7 @@
-Lane Rush : jeu de voiture a 3 voies
-Deplacer la voiture sur les voies gauche/centre/droite
-Esquiver le trafic qui arrive de plus en plus vite
-Le score et le meilleur score sont sauvegardes
-A : rejouer apres crash
+Dungeon Blitz : arena dungeon survival top-down
+Deplace ton heros avec le joystick J1 et esquive les vagues
+A : slash frontal rapide
+B : dash court pour se repositionner
+C : nova de zone (cooldown long)
+Le score augmente avec la survie et les ennemis elimines
 Z : quitter vers le menu borne
