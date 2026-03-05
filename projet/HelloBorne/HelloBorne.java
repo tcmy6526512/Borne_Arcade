@@ -44,10 +44,17 @@ public class HelloBorne {
         double y;
         Rectangle hitbox;
         Rectangle body;
+        Rectangle torso;
+        Rectangle belt;
         Rectangle cape;
         Rectangle head;
         Rectangle eyeL;
         Rectangle eyeR;
+        Rectangle brow;
+        Rectangle legL;
+        Rectangle legR;
+        Rectangle bootL;
+        Rectangle bootR;
         Rectangle swordGuard;
         Rectangle swordBlade;
         int dir;
@@ -58,12 +65,19 @@ public class HelloBorne {
             this.dir = DIR_UP;
 
             this.hitbox = rect(0, 0, PLAYER_W, PLAYER_H, Couleur.NOIR);
-            this.body = rect(0, 0, PLAYER_W, 42, Couleur.BLEU);
-            this.cape = rect(0, 0, PLAYER_W + 8, 16, Couleur.ROUGE);
-            this.head = rect(0, 0, 34, 26, Couleur.JAUNE);
-            this.eyeL = rect(0, 0, 6, 6, Couleur.NOIR);
-            this.eyeR = rect(0, 0, 6, 6, Couleur.NOIR);
-            this.swordGuard = rect(0, 0, 18, 8, Couleur.GRIS_CLAIR);
+            this.body = rect(0, 0, PLAYER_W, 42, Couleur.GRIS_FONCE);
+            this.torso = rect(0, 0, 34, 28, Couleur.GRIS);
+            this.belt = rect(0, 0, 34, 6, Couleur.ORANGE);
+            this.cape = rect(0, 0, PLAYER_W + 10, 18, Couleur.NOIR);
+            this.head = rect(0, 0, 30, 24, Couleur.JAUNE);
+            this.eyeL = rect(0, 0, 4, 4, Couleur.BLANC);
+            this.eyeR = rect(0, 0, 4, 4, Couleur.BLANC);
+            this.brow = rect(0, 0, 16, 3, Couleur.NOIR);
+            this.legL = rect(0, 0, 12, 16, Couleur.GRIS_FONCE);
+            this.legR = rect(0, 0, 12, 16, Couleur.GRIS_FONCE);
+            this.bootL = rect(0, 0, 14, 6, Couleur.NOIR);
+            this.bootR = rect(0, 0, 14, 6, Couleur.NOIR);
+            this.swordGuard = rect(0, 0, 18, 8, Couleur.GRIS);
             this.swordBlade = rect(0, 0, 14, 34, Couleur.BLANC);
             updateVisual();
         }
@@ -73,10 +87,17 @@ public class HelloBorne {
             y += dy;
             hitbox.translater(dx, dy);
             body.translater(dx, dy);
+            torso.translater(dx, dy);
+            belt.translater(dx, dy);
             cape.translater(dx, dy);
             head.translater(dx, dy);
             eyeL.translater(dx, dy);
             eyeR.translater(dx, dy);
+            brow.translater(dx, dy);
+            legL.translater(dx, dy);
+            legR.translater(dx, dy);
+            bootL.translater(dx, dy);
+            bootR.translater(dx, dy);
             swordGuard.translater(dx, dy);
             swordBlade.translater(dx, dy);
         }
@@ -92,11 +113,18 @@ public class HelloBorne {
             int y0 = (int) y;
 
             moveTo(hitbox, x0, y0);
-            moveTo(body, x0, y0 + 12);
-            moveTo(cape, x0 - 4, y0 + 4);
-            moveTo(head, x0 + 10, y0 + 44);
-            moveTo(eyeL, x0 + 16, y0 + 58);
-            moveTo(eyeR, x0 + 28, y0 + 58);
+            moveTo(body, x0, y0 + 16);
+            moveTo(torso, x0 + 10, y0 + 24);
+            moveTo(belt, x0 + 10, y0 + 21);
+            moveTo(cape, x0 - 5, y0 + 10);
+            moveTo(head, x0 + 12, y0 + 48);
+            moveTo(eyeL, x0 + 17, y0 + 58);
+            moveTo(eyeR, x0 + 25, y0 + 58);
+            moveTo(brow, x0 + 16, y0 + 62);
+            moveTo(legL, x0 + 12, y0 + 4);
+            moveTo(legR, x0 + 30, y0 + 4);
+            moveTo(bootL, x0 + 11, y0);
+            moveTo(bootR, x0 + 29, y0);
 
             if (dir == DIR_UP) {
                 moveTo(swordGuard, x0 + 18, y0 + 62);
@@ -114,7 +142,7 @@ public class HelloBorne {
         }
 
         Rectangle[] drawable() {
-            return new Rectangle[] {cape, body, head, eyeL, eyeR, swordGuard, swordBlade};
+            return new Rectangle[] {cape, body, torso, belt, legL, legR, bootL, bootR, head, brow, eyeL, eyeR, swordGuard, swordBlade};
         }
     }
 
@@ -276,7 +304,7 @@ public class HelloBorne {
         return moved;
     }
 
-    private static Enemy spawnEnemy(Random rng, int wave) {
+    private static Enemy spawnEnemy(Random rng, int wave, Couleur color) {
         int side = rng.nextInt(4);
         int x;
         int y;
@@ -297,8 +325,25 @@ public class HelloBorne {
 
         double speed = Math.min(4.6, 1.4 + wave * 0.2);
         int hp = 2 + wave / 3;
-        Couleur c = (wave % 3 == 0) ? Couleur.BLEU : (wave % 2 == 0 ? Couleur.ROUGE : Couleur.VERT);
-        return new Enemy(x, y, speed, hp, c);
+        return new Enemy(x, y, speed, hp, color);
+    }
+
+    private static Couleur waveColor(int wave) {
+        int idx = (wave - 1) % 4;
+        if (idx == 0) {
+            return Couleur.VERT;
+        }
+        if (idx == 1) {
+            return Couleur.ROUGE;
+        }
+        if (idx == 2) {
+            return Couleur.ORANGE;
+        }
+        return Couleur.BLEU;
+    }
+
+    private static int enemiesForWave(int wave) {
+        return 5 + wave * 2;
     }
 
     private static int loadBestScore() {
@@ -431,6 +476,9 @@ public class HelloBorne {
         int hp = 6;
         int score = 0;
         boolean gameOver = false;
+        int currentWave = 1;
+        int spawnedInWave = 0;
+        int enemiesTargetForWave = enemiesForWave(currentWave);
 
         while (true) {
             try {
@@ -444,10 +492,9 @@ public class HelloBorne {
                 break;
             }
 
-            int wave = 1 + (int) ((now - start) / 18000);
-            waveTxt.setTexte("Wave: " + wave);
+            waveTxt.setTexte("Wave: " + currentWave + " (" + enemies.size() + " restants)");
 
-            long dashCd = Math.max(520, 900 - wave * 12);
+            long dashCd = Math.max(520, 900 - currentWave * 12);
             long novaCd = 3000;
             String dashStatus = (now - lastDash >= dashCd) ? "ready" : ("" + ((dashCd - (now - lastDash)) / 1000 + 1) + "s");
             String novaStatus = (now - lastNova >= novaCd) ? "ready" : ("" + ((novaCd - (now - lastNova)) / 1000 + 1) + "s");
@@ -491,6 +538,9 @@ public class HelloBorne {
                     lastDash = 0;
                     lastNova = 0;
                     lastHit = 0;
+                    currentWave = 1;
+                    spawnedInWave = 0;
+                    enemiesTargetForWave = enemiesForWave(currentWave);
 
                     hpTxt.setTexte("HP: 6");
                     scoreTxt.setTexte("Score: 0");
@@ -595,15 +645,22 @@ public class HelloBorne {
                 }
             }
 
-            int maxEnemies = 4 + wave * 2;
-            int spawnDelay = Math.max(210, 980 - wave * 46);
-            if (enemies.size() < maxEnemies && now - lastSpawn >= spawnDelay) {
-                Enemy e = spawnEnemy(rng, wave);
+            int spawnDelay = Math.max(200, 960 - currentWave * 38);
+            if (spawnedInWave < enemiesTargetForWave && now - lastSpawn >= spawnDelay) {
+                Enemy e = spawnEnemy(rng, currentWave, waveColor(currentWave));
                 enemies.add(e);
                 for (Rectangle r : e.drawable()) {
                     f.ajouter(r);
                 }
+                spawnedInWave++;
                 lastSpawn = now;
+            }
+
+            if (spawnedInWave >= enemiesTargetForWave && enemies.isEmpty()) {
+                currentWave++;
+                spawnedInWave = 0;
+                enemiesTargetForWave = enemiesForWave(currentWave);
+                infoTxt.setTexte("Wave " + currentWave + " !");
             }
 
             for (Enemy e : enemies) {
