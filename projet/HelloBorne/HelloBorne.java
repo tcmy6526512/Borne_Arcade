@@ -3,6 +3,7 @@ import MG2D.FenetrePleinEcran;
 import MG2D.geometrie.Point;
 import MG2D.geometrie.Rectangle;
 import MG2D.geometrie.Texte;
+import MG2D.geometrie.Texture;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,6 +18,7 @@ public class HelloBorne {
 
     private static final int LARGEUR = 1275;
     private static final int HAUTEUR = 1020;
+
     private static final int ROAD_LEFT = 260;
     private static final int ROAD_RIGHT = 1015;
     private static final int ROAD_BOTTOM = 0;
@@ -28,29 +30,58 @@ public class HelloBorne {
     private static final int PLAYER_Y = 85;
 
     private static final String SCORE_FILE = "projet/HelloBorne/highscore";
+    private static final String PLAYER_SPRITE = "projet/InitialDrift/img/jeep.png";
+    private static final String ENEMY_SPRITE = "projet/InitialDrift/img/tonneau_ennemi.png";
 
     private static class Obstacle {
-        Rectangle rect;
+        Rectangle hitbox;
+        Texture sprite;
         int speed;
 
-        Obstacle(Rectangle rect, int speed) {
-            this.rect = rect;
+        Obstacle(Rectangle hitbox, Texture sprite, int speed) {
+            this.hitbox = hitbox;
+            this.sprite = sprite;
             this.speed = speed;
         }
     }
 
     private static int laneCenterX(int lane) {
         int laneWidth = (ROAD_RIGHT - ROAD_LEFT) / LANES;
-        return ROAD_LEFT + (lane * laneWidth) + laneWidth / 2;
+        return ROAD_LEFT + lane * laneWidth + laneWidth / 2;
     }
 
-    private static void placeCar(Rectangle car, int lane, int y) {
-        int cx = laneCenterX(lane);
-        int left = cx - CAR_W / 2;
-        // MG2D valide chaque coin au moment du set; on met d'abord B puis A
-        // pour ne jamais avoir temporairement A > B lors du changement de voie.
-        car.setB(new Point(left + CAR_W, y + CAR_H));
-        car.setA(new Point(left, y));
+    private static Rectangle buildHitbox(int left, int bottom, int width, int height) {
+        Rectangle r = new Rectangle(Couleur.NOIR, new Point(left, bottom), new Point(left + width, bottom + height));
+        r.setPlein(true);
+        return r;
+    }
+
+    private static void moveRectTo(Rectangle rect, int left, int bottom) {
+        int currentLeft = Math.min(rect.getA().getX(), rect.getB().getX());
+        int currentBottom = Math.min(rect.getA().getY(), rect.getB().getY());
+        rect.translater(left - currentLeft, bottom - currentBottom);
+    }
+
+    private static void placeCar(Rectangle car, Texture sprite, int lane, int y) {
+        int left = laneCenterX(lane) - CAR_W / 2;
+        moveRectTo(car, left, y);
+        if (sprite != null) {
+            Rectangle box = sprite.getBoiteEnglobante();
+            int currentLeft = Math.min(box.getA().getX(), box.getB().getX());
+            int currentBottom = Math.min(box.getA().getY(), box.getB().getY());
+            sprite.translater(left - currentLeft, y - currentBottom);
+        }
+    }
+
+    private static Texture buildSpriteOrNull(String path, int left, int bottom, int width, int height) {
+        try {
+            if (new File(path).exists()) {
+                return new Texture(path, new Point(left, bottom), width, height);
+            }
+        } catch (Exception e) {
+            System.err.println("Sprite indisponible: " + path + " -> " + e.getMessage());
+        }
+        return null;
     }
 
     private static boolean intersects(Rectangle a, Rectangle b) {
@@ -109,22 +140,35 @@ public class HelloBorne {
         return r;
     }
 
+    private static Obstacle buildObstacle(int lane, int speed, Random rng) {
+        int left = laneCenterX(lane) - CAR_W / 2;
+        int bottom = HAUTEUR + 20 + rng.nextInt(120);
+
+        Rectangle hitbox = buildHitbox(left, bottom, CAR_W, CAR_H);
+        Texture sprite = buildSpriteOrNull(ENEMY_SPRITE, left, bottom, CAR_W, CAR_H);
+
+        return new Obstacle(hitbox, sprite, speed);
+    }
+
     public static void main(String[] args) {
         FenetrePleinEcran f = new FenetrePleinEcran("HelloBorne Lane Rush");
         f.setVisible(true);
 
         ClavierBorneArcade clavier = new ClavierBorneArcade();
         f.addKeyListener(clavier);
-        f.getP().addKeyListener(clavier);
+        if (f.getP() != null) {
+            f.getP().addKeyListener(clavier);
+            f.getP().requestFocusInWindow();
+        }
 
         Rectangle bg = solidRect(Couleur.GRIS_FONCE, 0, 0, LARGEUR, HAUTEUR);
         Rectangle road = solidRect(Couleur.NOIR, ROAD_LEFT, ROAD_BOTTOM, ROAD_RIGHT, ROAD_TOP);
         Rectangle borderL = solidRect(Couleur.JAUNE, ROAD_LEFT - 8, ROAD_BOTTOM, ROAD_LEFT, ROAD_TOP);
         Rectangle borderR = solidRect(Couleur.JAUNE, ROAD_RIGHT, ROAD_BOTTOM, ROAD_RIGHT + 8, ROAD_TOP);
 
-        Rectangle player = solidRect(Couleur.VERT, 0, 0, CAR_W, CAR_H);
-        int playerLane = 1;
-        placeCar(player, playerLane, PLAYER_Y);
+        int playerLeft = laneCenterX(1) - CAR_W / 2;
+        Rectangle playerHitbox = buildHitbox(playerLeft, PLAYER_Y, CAR_W, CAR_H);
+        Texture playerSprite = buildSpriteOrNull(PLAYER_SPRITE, playerLeft, PLAYER_Y, CAR_W, CAR_H);
 
         ArrayList<Rectangle> laneMarks = new ArrayList<>();
         int laneWidth = (ROAD_RIGHT - ROAD_LEFT) / LANES;
@@ -143,7 +187,7 @@ public class HelloBorne {
         int bestScore = loadBestScore();
         Texte bestTxt = new Texte(Couleur.BLANC, "Best: " + bestScore, font, new Point(1100, 980));
         Texte levelTxt = new Texte(Couleur.BLANC, "Level: 1", font, new Point(640, 940));
-        Texte helpTxt = new Texte(Couleur.GRIS_CLAIR, "J1 Gauche/Droite: voie | A: rejouer | Z: quitter", font, new Point(640, 40));
+        Texte helpTxt = new Texte(Couleur.GRIS_CLAIR, "Borne J1 Gauche/Droite: voie | A: rejouer | Z: quitter", font, new Point(640, 40));
         Texte infoTxt = new Texte(Couleur.JAUNE, "", font, new Point(640, 520));
 
         f.ajouter(bg);
@@ -153,7 +197,13 @@ public class HelloBorne {
         for (Rectangle mark : laneMarks) {
             f.ajouter(mark);
         }
-        f.ajouter(player);
+        if (playerSprite != null) {
+            f.ajouter(playerSprite);
+        } else {
+            Rectangle fallbackPlayer = solidRect(Couleur.VERT, playerLeft, PLAYER_Y, playerLeft + CAR_W, PLAYER_Y + CAR_H);
+            f.ajouter(fallbackPlayer);
+            playerHitbox = fallbackPlayer;
+        }
         f.ajouter(title);
         f.ajouter(scoreTxt);
         f.ajouter(bestTxt);
@@ -168,9 +218,11 @@ public class HelloBorne {
         int[] laneCooldown = new int[] {0, 0, 0};
         long startTime = System.currentTimeMillis();
         long lastSpawn = startTime;
+        long lastScoreTick = startTime;
 
         int score = 0;
         boolean gameOver = false;
+        int playerLane = 1;
 
         while (true) {
             try {
@@ -186,7 +238,11 @@ public class HelloBorne {
             if (gameOver) {
                 if (clavier.getBoutonJ1ATape()) {
                     for (Obstacle obs : obstacles) {
-                        f.supprimer(obs.rect);
+                        if (obs.sprite != null) {
+                            f.supprimer(obs.sprite);
+                        } else {
+                            f.supprimer(obs.hitbox);
+                        }
                     }
                     obstacles.clear();
 
@@ -196,10 +252,11 @@ public class HelloBorne {
 
                     startTime = System.currentTimeMillis();
                     lastSpawn = startTime;
+                    lastScoreTick = startTime;
                     score = 0;
                     playerLane = 1;
-                    placeCar(player, playerLane, PLAYER_Y);
-                    player.setCouleur(Couleur.VERT);
+                    placeCar(playerHitbox, playerSprite, playerLane, PLAYER_Y);
+
                     scoreTxt.setTexte("Score: 0");
                     levelTxt.setTexte("Level: 1");
                     infoTxt.setTexte("");
@@ -211,30 +268,32 @@ public class HelloBorne {
 
             if (clavier.getJoyJ1GaucheTape() && playerLane > 0) {
                 playerLane--;
-                placeCar(player, playerLane, PLAYER_Y);
+                placeCar(playerHitbox, playerSprite, playerLane, PLAYER_Y);
             }
             if (clavier.getJoyJ1DroiteTape() && playerLane < LANES - 1) {
                 playerLane++;
-                placeCar(player, playerLane, PLAYER_Y);
+                placeCar(playerHitbox, playerSprite, playerLane, PLAYER_Y);
             }
 
             for (Rectangle mark : laneMarks) {
                 mark.translater(0, -10);
                 if (mark.getB().getY() < 0) {
-                    int h = mark.getB().getY() - mark.getA().getY();
-                    // Meme contrainte MG2D: toujours definir B avant A pour eviter un etat temporaire invalide.
-                    mark.setB(new Point(mark.getB().getX(), HAUTEUR + 1 + h));
-                    mark.setA(new Point(mark.getA().getX(), HAUTEUR + 1));
+                    mark.translater(0, HAUTEUR + 180);
                 }
             }
 
             long now = System.currentTimeMillis();
             long elapsedSec = (now - startTime) / 1000;
             int level = 1 + (int) (elapsedSec / 10);
-            int speed = Math.min(24, 9 + level / 2);
-            int spawnDelay = Math.max(240, 900 - 24 * level);
+            int speed = Math.min(26, 10 + level / 2);
+            int spawnDelay = Math.max(200, 820 - 22 * level);
 
             levelTxt.setTexte("Level: " + level);
+
+            while (now - lastScoreTick >= 200) {
+                score += 1;
+                lastScoreTick += 200;
+            }
 
             for (int i = 0; i < LANES; i++) {
                 laneCooldown[i] = Math.max(0, laneCooldown[i] - 20);
@@ -250,13 +309,15 @@ public class HelloBorne {
 
                 if (!openLanes.isEmpty()) {
                     int lane = openLanes.get(rng.nextInt(openLanes.size()));
-                    int cx = laneCenterX(lane);
-                    int left = cx - CAR_W / 2;
-                    int yBottom = HAUTEUR + 20;
-                    Rectangle enemy = solidRect(rng.nextBoolean() ? Couleur.ROUGE : Couleur.BLEU, left, yBottom, left + CAR_W, yBottom + CAR_H);
-                    obstacles.add(new Obstacle(enemy, speed));
-                    f.ajouter(enemy);
-                    laneCooldown[lane] = 340;
+                    Obstacle obs = buildObstacle(lane, speed, rng);
+                    obstacles.add(obs);
+                    if (obs.sprite != null) {
+                        f.ajouter(obs.sprite);
+                    } else {
+                        obs.hitbox.setCouleur(rng.nextBoolean() ? Couleur.ROUGE : Couleur.BLEU);
+                        f.ajouter(obs.hitbox);
+                    }
+                    laneCooldown[lane] = 280;
                 }
                 lastSpawn = now;
             }
@@ -264,11 +325,13 @@ public class HelloBorne {
             Iterator<Obstacle> it = obstacles.iterator();
             while (it.hasNext()) {
                 Obstacle obs = it.next();
-                obs.rect.translater(0, -obs.speed);
+                obs.hitbox.translater(0, -obs.speed);
+                if (obs.sprite != null) {
+                    obs.sprite.translater(0, -obs.speed);
+                }
 
-                if (intersects(player, obs.rect)) {
+                if (intersects(playerHitbox, obs.hitbox)) {
                     gameOver = true;
-                    player.setCouleur(Couleur.ROUGE);
                     infoTxt.setTexte("CRASH! Appuie sur A pour rejouer");
                     if (score > bestScore) {
                         bestScore = score;
@@ -278,10 +341,14 @@ public class HelloBorne {
                     break;
                 }
 
-                if (obs.rect.getB().getY() < 0) {
-                    f.supprimer(obs.rect);
+                if (obs.hitbox.getB().getY() < 0) {
+                    if (obs.sprite != null) {
+                        f.supprimer(obs.sprite);
+                    } else {
+                        f.supprimer(obs.hitbox);
+                    }
                     it.remove();
-                    score++;
+                    score += 3;
                 }
             }
 
