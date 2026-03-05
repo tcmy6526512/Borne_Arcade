@@ -102,6 +102,7 @@ public class HelloBorne {
 
     public static void main(String[] args) {
         FenetrePleinEcran fen = new FenetrePleinEcran("Lane Rush");
+        fen.setVisible(true);
         ClavierBorneArcade clavier = new ClavierBorneArcade();
         fen.addKeyListener(clavier);
         fen.getP().addKeyListener(clavier);
