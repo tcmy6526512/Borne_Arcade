@@ -3,6 +3,7 @@ import MG2D.FenetrePleinEcran;
 import MG2D.geometrie.Point;
 import MG2D.geometrie.Rectangle;
 import MG2D.geometrie.Texte;
+import java.awt.Color;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -103,9 +104,14 @@ public class HelloBorne {
     public static void main(String[] args) {
         FenetrePleinEcran fen = new FenetrePleinEcran("Lane Rush");
         fen.setVisible(true);
+        fen.setBackground(Color.BLACK);
         ClavierBorneArcade clavier = new ClavierBorneArcade();
         fen.addKeyListener(clavier);
-        fen.getP().addKeyListener(clavier);
+        if (fen.getP() != null) {
+            fen.getP().addKeyListener(clavier);
+            fen.getP().requestFocusInWindow();
+        }
+        fen.requestFocus();
 
         Rectangle fond = new Rectangle(Couleur.GRIS_FONCE, new Point(0, 0), LARGEUR, HAUTEUR, true);
         Rectangle route = new Rectangle(Couleur.NOIR, new Point(ROAD_LEFT, ROAD_BOTTOM), new Point(ROAD_RIGHT, ROAD_TOP), true);
@@ -156,6 +162,9 @@ public class HelloBorne {
         fen.ajouter(help3);
         fen.ajouter(info);
 
+        // Force an initial frame to avoid a blank window if startup is slow.
+        fen.rafraichir();
+
         ArrayList<Obstacle> traffic = new ArrayList<>();
         Random rng = new Random();
 
@@ -173,106 +182,112 @@ public class HelloBorne {
                 System.err.println(e.getMessage());
             }
 
-            if (clavier.getBoutonJ1ZTape()) {
-                break;
-            }
-
-            if (gameOver) {
-                if (clavier.getBoutonJ1ATape()) {
-                    for (Obstacle obs : traffic) {
-                        fen.supprimer(obs.shape);
-                    }
-                    traffic.clear();
-                    score = 0;
-                    lastSpawn = System.currentTimeMillis();
-                    startTime = System.currentTimeMillis();
-                    spawnDelayMs = 900;
-                    laneCooldown[0] = laneCooldown[1] = laneCooldown[2] = 0;
-                    playerLane = 1;
-                    setCarLane(joueur, playerLane, PLAYER_Y);
-                    info.setTexte("");
-                    scoreTxt.setTexte("Score: 0");
-                    levelTxt.setTexte("Level: 1");
-                    gameOver = false;
-                }
-                fen.rafraichir();
-                continue;
-            }
-
-            if (clavier.getJoyJ1GaucheTape() && playerLane > 0) {
-                playerLane--;
-                setCarLane(joueur, playerLane, PLAYER_Y);
-            }
-            if (clavier.getJoyJ1DroiteTape() && playerLane < LANES - 1) {
-                playerLane++;
-                setCarLane(joueur, playerLane, PLAYER_Y);
-            }
-
-            // Animation route (impression de mouvement)
-            int roadAnimSpeed = 9;
-            for (Rectangle mark : tirets) {
-                mark.translater(0, -roadAnimSpeed);
-                if (mark.getB().getY() < 0) {
-                    int h = Math.abs(mark.getB().getY() - mark.getA().getY());
-                    mark.setA(new Point(mark.getA().getX(), HAUTEUR + h));
-                    mark.setB(new Point(mark.getB().getX(), HAUTEUR + 2 * h));
-                }
-            }
-
-            long now = System.currentTimeMillis();
-            long elapsedSeconds = (now - startTime) / 1000;
-            int level = 1 + (int) (elapsedSeconds / 10);
-            int trafficSpeed = Math.min(23, 9 + level / 2);
-            spawnDelayMs = Math.max(230, 900 - level * 22);
-            levelTxt.setTexte("Level: " + level);
-
-            for (int i = 0; i < LANES; i++) {
-                laneCooldown[i] = Math.max(0, laneCooldown[i] - 20);
-            }
-
-            if (now - lastSpawn >= spawnDelayMs) {
-                ArrayList<Integer> open = new ArrayList<>();
-                for (int lane = 0; lane < LANES; lane++) {
-                    if (laneCooldown[lane] == 0) {
-                        open.add(lane);
-                    }
-                }
-
-                if (!open.isEmpty()) {
-                    int lane = open.get(rng.nextInt(open.size()));
-                    Obstacle obs = buildTrafficCar(lane, trafficSpeed, rng);
-                    traffic.add(obs);
-                    fen.ajouter(obs.shape);
-                    laneCooldown[lane] = 350;
-                }
-                lastSpawn = now;
-            }
-
-            Iterator<Obstacle> it = traffic.iterator();
-            while (it.hasNext()) {
-                Obstacle obs = it.next();
-                obs.shape.translater(0, -obs.speed);
-
-                if (intersects(joueur, obs.shape)) {
-                    gameOver = true;
-                    if (score > bestScore) {
-                        bestScore = score;
-                        saveBestScore(bestScore);
-                        bestTxt.setTexte("Best: " + bestScore);
-                    }
-                    info.setTexte("CRASH! A pour rejouer");
+            try {
+                if (clavier.getBoutonJ1ZTape()) {
                     break;
                 }
 
-                if (obs.shape.getB().getY() < 0) {
-                    fen.supprimer(obs.shape);
-                    it.remove();
-                    score += 1;
+                if (gameOver) {
+                    if (clavier.getBoutonJ1ATape()) {
+                        for (Obstacle obs : traffic) {
+                            fen.supprimer(obs.shape);
+                        }
+                        traffic.clear();
+                        score = 0;
+                        lastSpawn = System.currentTimeMillis();
+                        startTime = System.currentTimeMillis();
+                        spawnDelayMs = 900;
+                        laneCooldown[0] = laneCooldown[1] = laneCooldown[2] = 0;
+                        playerLane = 1;
+                        setCarLane(joueur, playerLane, PLAYER_Y);
+                        info.setTexte("");
+                        scoreTxt.setTexte("Score: 0");
+                        levelTxt.setTexte("Level: 1");
+                        gameOver = false;
+                    }
+                    fen.rafraichir();
+                    continue;
                 }
-            }
 
-            scoreTxt.setTexte("Score: " + score);
-            fen.rafraichir();
+                if (clavier.getJoyJ1GaucheTape() && playerLane > 0) {
+                    playerLane--;
+                    setCarLane(joueur, playerLane, PLAYER_Y);
+                }
+                if (clavier.getJoyJ1DroiteTape() && playerLane < LANES - 1) {
+                    playerLane++;
+                    setCarLane(joueur, playerLane, PLAYER_Y);
+                }
+
+                // Animation route (impression de mouvement)
+                int roadAnimSpeed = 9;
+                for (Rectangle mark : tirets) {
+                    mark.translater(0, -roadAnimSpeed);
+                    if (mark.getB().getY() < 0) {
+                        int h = Math.abs(mark.getB().getY() - mark.getA().getY());
+                        mark.setA(new Point(mark.getA().getX(), HAUTEUR + h));
+                        mark.setB(new Point(mark.getB().getX(), HAUTEUR + 2 * h));
+                    }
+                }
+
+                long now = System.currentTimeMillis();
+                long elapsedSeconds = (now - startTime) / 1000;
+                int level = 1 + (int) (elapsedSeconds / 10);
+                int trafficSpeed = Math.min(23, 9 + level / 2);
+                spawnDelayMs = Math.max(230, 900 - level * 22);
+                levelTxt.setTexte("Level: " + level);
+
+                for (int i = 0; i < LANES; i++) {
+                    laneCooldown[i] = Math.max(0, laneCooldown[i] - 20);
+                }
+
+                if (now - lastSpawn >= spawnDelayMs) {
+                    ArrayList<Integer> open = new ArrayList<>();
+                    for (int lane = 0; lane < LANES; lane++) {
+                        if (laneCooldown[lane] == 0) {
+                            open.add(lane);
+                        }
+                    }
+
+                    if (!open.isEmpty()) {
+                        int lane = open.get(rng.nextInt(open.size()));
+                        Obstacle obs = buildTrafficCar(lane, trafficSpeed, rng);
+                        traffic.add(obs);
+                        fen.ajouter(obs.shape);
+                        laneCooldown[lane] = 350;
+                    }
+                    lastSpawn = now;
+                }
+
+                Iterator<Obstacle> it = traffic.iterator();
+                while (it.hasNext()) {
+                    Obstacle obs = it.next();
+                    obs.shape.translater(0, -obs.speed);
+
+                    if (intersects(joueur, obs.shape)) {
+                        gameOver = true;
+                        if (score > bestScore) {
+                            bestScore = score;
+                            saveBestScore(bestScore);
+                            bestTxt.setTexte("Best: " + bestScore);
+                        }
+                        info.setTexte("CRASH! A pour rejouer");
+                        break;
+                    }
+
+                    if (obs.shape.getB().getY() < 0) {
+                        fen.supprimer(obs.shape);
+                        it.remove();
+                        score += 1;
+                    }
+                }
+
+                scoreTxt.setTexte("Score: " + score);
+                fen.rafraichir();
+            } catch (Exception e) {
+                info.setTexte("Erreur runtime, voir terminal");
+                fen.rafraichir();
+                e.printStackTrace();
+            }
         }
 
         System.exit(0);
