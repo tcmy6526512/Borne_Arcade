@@ -1,1 +1,1 @@
-Bouger:Rejouer:...:...:...:...:Quitter
+Voie gauche/droite:Rejouer:...:...:...:...:Quitter

@@ -1,6 +1,6 @@
-Comet Rush : jeu de survie arcade
-Esquiver les blocs rouges le plus longtemps possible
-Le score augmente a chaque obstacle evite
-Le meilleur score est sauvegarde automatiquement
-Appuyer sur A pour rejouer apres un game over
-Appuyer sur Z pour revenir au menu borne
+Lane Rush : jeu de voiture a 3 voies
+Deplacer la voiture sur les voies gauche/centre/droite
+Esquiver le trafic qui arrive de plus en plus vite
+Le score et le meilleur score sont sauvegardes
+A : rejouer apres crash
+Z : quitter vers le menu borne

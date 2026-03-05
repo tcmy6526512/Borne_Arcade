@@ -17,9 +17,14 @@ public class HelloBorne {
 
     private static final int LARGEUR = 1280;
     private static final int HAUTEUR = 1024;
-    private static final int MARGE = 20;
-    private static final int TAILLE_JOUEUR = 70;
-    private static final int VITESSE_JOUEUR = 11;
+    private static final int ROAD_LEFT = 300;
+    private static final int ROAD_RIGHT = 980;
+    private static final int ROAD_BOTTOM = 0;
+    private static final int ROAD_TOP = HAUTEUR;
+    private static final int LANES = 3;
+    private static final int CAR_W = 92;
+    private static final int CAR_H = 150;
+    private static final int PLAYER_Y = 90;
     private static final String SCORE_FILE = "projet/HelloBorne/highscore";
 
     private static class Obstacle {
@@ -30,10 +35,6 @@ public class HelloBorne {
             this.shape = shape;
             this.speed = speed;
         }
-    }
-
-    private static int clamp(int v, int min, int max) {
-        return Math.max(min, Math.min(max, v));
     }
 
     private static boolean intersects(Rectangle a, Rectangle b) {
@@ -80,54 +81,87 @@ public class HelloBorne {
         }
     }
 
-    private static Obstacle buildObstacle(Random rng) {
-        int size = 45 + rng.nextInt(65);
-        int x = MARGE + rng.nextInt(LARGEUR - 2 * MARGE - size);
-        int speed = 6 + rng.nextInt(7);
-        Rectangle r = new Rectangle(Couleur.ROUGE, new Point(x, HAUTEUR + size), size, size, true);
+    private static int laneCenterX(int lane) {
+        int laneWidth = (ROAD_RIGHT - ROAD_LEFT) / LANES;
+        return ROAD_LEFT + laneWidth / 2 + lane * laneWidth;
+    }
+
+    private static void setCarLane(Rectangle car, int lane, int y) {
+        int x = laneCenterX(lane) - CAR_W / 2;
+        car.setA(new Point(x, y));
+        car.setB(new Point(x + CAR_W, y + CAR_H));
+    }
+
+    private static Obstacle buildTrafficCar(int lane, int speed, Random rng) {
+        int x = laneCenterX(lane) - CAR_W / 2;
+        int y = HAUTEUR + CAR_H + rng.nextInt(120);
+        Couleur c = (rng.nextBoolean() ? Couleur.ROUGE : Couleur.BLEU);
+        Rectangle r = new Rectangle(c, new Point(x, y), CAR_W, CAR_H, true);
         return new Obstacle(r, speed);
     }
 
     public static void main(String[] args) {
-        FenetrePleinEcran fen = new FenetrePleinEcran("Comet Rush");
+        FenetrePleinEcran fen = new FenetrePleinEcran("Lane Rush");
         ClavierBorneArcade clavier = new ClavierBorneArcade();
         fen.addKeyListener(clavier);
         fen.getP().addKeyListener(clavier);
 
         Rectangle fond = new Rectangle(Couleur.GRIS_FONCE, new Point(0, 0), LARGEUR, HAUTEUR, true);
-        Rectangle zone = new Rectangle(Couleur.NOIR, new Point(MARGE, MARGE), LARGEUR - 2 * MARGE, HAUTEUR - 2 * MARGE, true);
-        Rectangle joueur = new Rectangle(Couleur.VERT, new Point(LARGEUR / 2 - TAILLE_JOUEUR / 2, 90), TAILLE_JOUEUR, TAILLE_JOUEUR, true);
+        Rectangle route = new Rectangle(Couleur.NOIR, new Point(ROAD_LEFT, ROAD_BOTTOM), new Point(ROAD_RIGHT, ROAD_TOP), true);
+        Rectangle bordG = new Rectangle(Couleur.JAUNE, new Point(ROAD_LEFT - 8, ROAD_BOTTOM), 8, ROAD_TOP, true);
+        Rectangle bordD = new Rectangle(Couleur.JAUNE, new Point(ROAD_RIGHT, ROAD_BOTTOM), 8, ROAD_TOP, true);
+        Rectangle joueur = new Rectangle(Couleur.VERT, new Point(0, 0), CAR_W, CAR_H, true);
+        int playerLane = 1;
+        setCarLane(joueur, playerLane, PLAYER_Y);
+
+        ArrayList<Rectangle> tirets = new ArrayList<>();
+        int laneWidth = (ROAD_RIGHT - ROAD_LEFT) / LANES;
+        for (int laneSep = 1; laneSep < LANES; laneSep++) {
+            int x = ROAD_LEFT + laneSep * laneWidth - 8;
+            for (int y = 0; y < HAUTEUR; y += 180) {
+                Rectangle mark = new Rectangle(Couleur.BLANC, new Point(x, y), 16, 90, true);
+                tirets.add(mark);
+            }
+        }
 
         Font fTitle = new Font("Calibri", Font.BOLD, 42);
         Font fMain = new Font("Calibri", Font.BOLD, 30);
         Font fHelp = new Font("Calibri", Font.PLAIN, 22);
 
-        Texte titre = new Texte(Couleur.BLANC, "COMET RUSH", fTitle, new Point(640, 985));
+        Texte titre = new Texte(Couleur.BLANC, "LANE RUSH", fTitle, new Point(640, 985));
         Texte scoreTxt = new Texte(Couleur.BLANC, "Score: 0", fMain, new Point(170, 980));
         int bestScore = loadBestScore();
-        Texte bestTxt = new Texte(Couleur.BLANC, "Best: " + bestScore, fMain, new Point(1110, 980));
-        Texte help1 = new Texte(Couleur.GRIS_CLAIR, "J1 joystick: bouger", fHelp, new Point(220, 45));
+        Texte bestTxt = new Texte(Couleur.BLANC, "Best: " + bestScore, fMain, new Point(1030, 980));
+        Texte levelTxt = new Texte(Couleur.BLANC, "Level: 1", fMain, new Point(640, 980));
+        Texte help1 = new Texte(Couleur.GRIS_CLAIR, "J1 gauche/droite: changer de voie", fHelp, new Point(280, 45));
         Texte help2 = new Texte(Couleur.GRIS_CLAIR, "A: rejouer", fHelp, new Point(620, 45));
         Texte help3 = new Texte(Couleur.GRIS_CLAIR, "Z: quitter", fHelp, new Point(1000, 45));
         Texte info = new Texte(Couleur.JAUNE, "", fMain, new Point(640, 520));
 
         fen.ajouter(fond);
-        fen.ajouter(zone);
+        fen.ajouter(route);
+        fen.ajouter(bordG);
+        fen.ajouter(bordD);
+        for (Rectangle mark : tirets) {
+            fen.ajouter(mark);
+        }
         fen.ajouter(joueur);
         fen.ajouter(titre);
         fen.ajouter(scoreTxt);
         fen.ajouter(bestTxt);
+        fen.ajouter(levelTxt);
         fen.ajouter(help1);
         fen.ajouter(help2);
         fen.ajouter(help3);
         fen.ajouter(info);
 
-        ArrayList<Obstacle> obstacles = new ArrayList<>();
+        ArrayList<Obstacle> traffic = new ArrayList<>();
         Random rng = new Random();
 
         long lastSpawn = System.currentTimeMillis();
         long startTime = System.currentTimeMillis();
         int spawnDelayMs = 900;
+        int[] laneCooldown = new int[] {0, 0, 0};
         int score = 0;
         boolean gameOver = false;
 
@@ -144,48 +178,76 @@ public class HelloBorne {
 
             if (gameOver) {
                 if (clavier.getBoutonJ1ATape()) {
-                    for (Obstacle obs : obstacles) {
+                    for (Obstacle obs : traffic) {
                         fen.supprimer(obs.shape);
                     }
-                    obstacles.clear();
+                    traffic.clear();
                     score = 0;
                     lastSpawn = System.currentTimeMillis();
                     startTime = System.currentTimeMillis();
                     spawnDelayMs = 900;
-                    joueur.setA(new Point(LARGEUR / 2 - TAILLE_JOUEUR / 2, 90));
-                    joueur.setB(new Point(LARGEUR / 2 + TAILLE_JOUEUR / 2, 90 + TAILLE_JOUEUR));
+                    laneCooldown[0] = laneCooldown[1] = laneCooldown[2] = 0;
+                    playerLane = 1;
+                    setCarLane(joueur, playerLane, PLAYER_Y);
                     info.setTexte("");
                     scoreTxt.setTexte("Score: 0");
+                    levelTxt.setTexte("Level: 1");
                     gameOver = false;
                 }
                 fen.rafraichir();
                 continue;
             }
 
-            int dx = 0;
-            int dy = 0;
-            if (clavier.getJoyJ1GaucheEnfoncee()) dx -= VITESSE_JOUEUR;
-            if (clavier.getJoyJ1DroiteEnfoncee()) dx += VITESSE_JOUEUR;
-            if (clavier.getJoyJ1HautEnfoncee()) dy += VITESSE_JOUEUR;
-            if (clavier.getJoyJ1BasEnfoncee()) dy -= VITESSE_JOUEUR;
+            if (clavier.getJoyJ1GaucheTape() && playerLane > 0) {
+                playerLane--;
+                setCarLane(joueur, playerLane, PLAYER_Y);
+            }
+            if (clavier.getJoyJ1DroiteTape() && playerLane < LANES - 1) {
+                playerLane++;
+                setCarLane(joueur, playerLane, PLAYER_Y);
+            }
 
-            int nx = clamp(joueur.getA().getX() + dx, MARGE + 2, LARGEUR - MARGE - 2 - TAILLE_JOUEUR);
-            int ny = clamp(joueur.getA().getY() + dy, MARGE + 2, HAUTEUR - MARGE - 2 - TAILLE_JOUEUR);
-            joueur.setA(new Point(nx, ny));
-            joueur.setB(new Point(nx + TAILLE_JOUEUR, ny + TAILLE_JOUEUR));
+            // Animation route (impression de mouvement)
+            int roadAnimSpeed = 9;
+            for (Rectangle mark : tirets) {
+                mark.translater(0, -roadAnimSpeed);
+                if (mark.getB().getY() < 0) {
+                    int h = Math.abs(mark.getB().getY() - mark.getA().getY());
+                    mark.setA(new Point(mark.getA().getX(), HAUTEUR + h));
+                    mark.setB(new Point(mark.getB().getX(), HAUTEUR + 2 * h));
+                }
+            }
 
             long now = System.currentTimeMillis();
             long elapsedSeconds = (now - startTime) / 1000;
-            spawnDelayMs = Math.max(260, 900 - (int) (elapsedSeconds * 10));
+            int level = 1 + (int) (elapsedSeconds / 10);
+            int trafficSpeed = Math.min(23, 9 + level / 2);
+            spawnDelayMs = Math.max(230, 900 - level * 22);
+            levelTxt.setTexte("Level: " + level);
+
+            for (int i = 0; i < LANES; i++) {
+                laneCooldown[i] = Math.max(0, laneCooldown[i] - 20);
+            }
 
             if (now - lastSpawn >= spawnDelayMs) {
-                Obstacle obs = buildObstacle(rng);
-                obstacles.add(obs);
-                fen.ajouter(obs.shape);
+                ArrayList<Integer> open = new ArrayList<>();
+                for (int lane = 0; lane < LANES; lane++) {
+                    if (laneCooldown[lane] == 0) {
+                        open.add(lane);
+                    }
+                }
+
+                if (!open.isEmpty()) {
+                    int lane = open.get(rng.nextInt(open.size()));
+                    Obstacle obs = buildTrafficCar(lane, trafficSpeed, rng);
+                    traffic.add(obs);
+                    fen.ajouter(obs.shape);
+                    laneCooldown[lane] = 350;
+                }
                 lastSpawn = now;
             }
 
-            Iterator<Obstacle> it = obstacles.iterator();
+            Iterator<Obstacle> it = traffic.iterator();
             while (it.hasNext()) {
                 Obstacle obs = it.next();
                 obs.shape.translater(0, -obs.speed);
@@ -197,7 +259,7 @@ public class HelloBorne {
                         saveBestScore(bestScore);
                         bestTxt.setTexte("Best: " + bestScore);
                     }
-                    info.setTexte("GAME OVER - A pour rejouer");
+                    info.setTexte("CRASH! A pour rejouer");
                     break;
                 }
 
