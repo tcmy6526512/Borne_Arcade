@@ -27,6 +27,7 @@ public class HelloBorne {
     private static final int PLAYER_H = 72;
     private static final int ENEMY_W = 48;
     private static final int ENEMY_H = 52;
+    private static final int ATTACK_RANGE = 180;
 
     private static final double PLAYER_SPEED = 5.2;
     private static final double DASH_SPEED = 12.0;
