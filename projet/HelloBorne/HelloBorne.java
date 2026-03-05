@@ -23,8 +23,8 @@ public class HelloBorne {
     private static final int ARENA_BOTTOM = 90;
     private static final int ARENA_TOP = 930;
 
-    private static final int PLAYER_W = 54;
-    private static final int PLAYER_H = 72;
+    private static final int PLAYER_W = 60;
+    private static final int PLAYER_H = 82;
     private static final int ENEMY_W = 48;
     private static final int ENEMY_H = 52;
     private static final int ATTACK_RANGE = 180;
@@ -43,20 +43,33 @@ public class HelloBorne {
         double x;
         double y;
         Rectangle hitbox;
-        Rectangle body;
-        Rectangle torso;
+        Rectangle capeBack;
+        Rectangle armorBase;
+        Rectangle armorChest;
+        Rectangle armorShadow;
         Rectangle belt;
-        Rectangle cape;
-        Rectangle head;
-        Rectangle eyeL;
-        Rectangle eyeR;
-        Rectangle brow;
+        Rectangle buckle;
+        Rectangle shoulderL;
+        Rectangle shoulderR;
+        Rectangle armL;
+        Rectangle armR;
+        Rectangle gloveL;
+        Rectangle gloveR;
         Rectangle legL;
         Rectangle legR;
         Rectangle bootL;
         Rectangle bootR;
+        Rectangle head;
+        Rectangle helmetTop;
+        Rectangle visor;
+        Rectangle plume;
+        Rectangle eyeL;
+        Rectangle eyeR;
+        Rectangle swordPommel;
+        Rectangle swordGrip;
         Rectangle swordGuard;
-        Rectangle swordBlade;
+        Rectangle swordBladeDark;
+        Rectangle swordBladeLight;
         int dir;
 
         Player(double x, double y) {
@@ -65,20 +78,33 @@ public class HelloBorne {
             this.dir = DIR_UP;
 
             this.hitbox = rect(0, 0, PLAYER_W, PLAYER_H, Couleur.NOIR);
-            this.body = rect(0, 0, PLAYER_W, 42, Couleur.GRIS_FONCE);
-            this.torso = rect(0, 0, 34, 28, Couleur.GRIS);
-            this.belt = rect(0, 0, 34, 6, Couleur.ORANGE);
-            this.cape = rect(0, 0, PLAYER_W + 10, 18, Couleur.NOIR);
-            this.head = rect(0, 0, 30, 24, Couleur.JAUNE);
-            this.eyeL = rect(0, 0, 4, 4, Couleur.BLANC);
-            this.eyeR = rect(0, 0, 4, 4, Couleur.BLANC);
-            this.brow = rect(0, 0, 16, 3, Couleur.NOIR);
-            this.legL = rect(0, 0, 12, 16, Couleur.GRIS_FONCE);
-            this.legR = rect(0, 0, 12, 16, Couleur.GRIS_FONCE);
+            this.capeBack = rect(0, 0, PLAYER_W + 10, 24, Couleur.ROUGE);
+            this.armorBase = rect(0, 0, 44, 36, Couleur.GRIS_FONCE);
+            this.armorChest = rect(0, 0, 30, 24, Couleur.GRIS_CLAIR);
+            this.armorShadow = rect(0, 0, 10, 24, Couleur.GRIS);
+            this.belt = rect(0, 0, 30, 6, Couleur.ORANGE);
+            this.buckle = rect(0, 0, 8, 6, Couleur.JAUNE);
+            this.shoulderL = rect(0, 0, 12, 10, Couleur.GRIS_CLAIR);
+            this.shoulderR = rect(0, 0, 12, 10, Couleur.GRIS_CLAIR);
+            this.armL = rect(0, 0, 10, 16, Couleur.GRIS);
+            this.armR = rect(0, 0, 10, 16, Couleur.GRIS);
+            this.gloveL = rect(0, 0, 10, 8, Couleur.NOIR);
+            this.gloveR = rect(0, 0, 10, 8, Couleur.NOIR);
+            this.legL = rect(0, 0, 12, 18, Couleur.GRIS_FONCE);
+            this.legR = rect(0, 0, 12, 18, Couleur.GRIS_FONCE);
             this.bootL = rect(0, 0, 14, 6, Couleur.NOIR);
             this.bootR = rect(0, 0, 14, 6, Couleur.NOIR);
-            this.swordGuard = rect(0, 0, 18, 8, Couleur.GRIS);
-            this.swordBlade = rect(0, 0, 14, 34, Couleur.BLANC);
+            this.head = rect(0, 0, 26, 18, Couleur.JAUNE);
+            this.helmetTop = rect(0, 0, 30, 10, Couleur.GRIS_CLAIR);
+            this.visor = rect(0, 0, 26, 6, Couleur.GRIS_FONCE);
+            this.plume = rect(0, 0, 8, 12, Couleur.ROUGE);
+            this.eyeL = rect(0, 0, 3, 3, Couleur.BLANC);
+            this.eyeR = rect(0, 0, 3, 3, Couleur.BLANC);
+            this.swordPommel = rect(0, 0, 8, 6, Couleur.JAUNE);
+            this.swordGrip = rect(0, 0, 8, 16, Couleur.ORANGE);
+            this.swordGuard = rect(0, 0, 20, 6, Couleur.JAUNE);
+            this.swordBladeDark = rect(0, 0, 10, 40, Couleur.GRIS);
+            this.swordBladeLight = rect(0, 0, 4, 36, Couleur.BLANC);
             updateVisual();
         }
 
@@ -86,20 +112,33 @@ public class HelloBorne {
             x += dx;
             y += dy;
             hitbox.translater(dx, dy);
-            body.translater(dx, dy);
-            torso.translater(dx, dy);
+            capeBack.translater(dx, dy);
+            armorBase.translater(dx, dy);
+            armorChest.translater(dx, dy);
+            armorShadow.translater(dx, dy);
             belt.translater(dx, dy);
-            cape.translater(dx, dy);
+            buckle.translater(dx, dy);
+            shoulderL.translater(dx, dy);
+            shoulderR.translater(dx, dy);
+            armL.translater(dx, dy);
+            armR.translater(dx, dy);
+            gloveL.translater(dx, dy);
+            gloveR.translater(dx, dy);
             head.translater(dx, dy);
+            helmetTop.translater(dx, dy);
+            visor.translater(dx, dy);
+            plume.translater(dx, dy);
             eyeL.translater(dx, dy);
             eyeR.translater(dx, dy);
-            brow.translater(dx, dy);
             legL.translater(dx, dy);
             legR.translater(dx, dy);
             bootL.translater(dx, dy);
             bootR.translater(dx, dy);
+            swordPommel.translater(dx, dy);
+            swordGrip.translater(dx, dy);
             swordGuard.translater(dx, dy);
-            swordBlade.translater(dx, dy);
+            swordBladeDark.translater(dx, dy);
+            swordBladeLight.translater(dx, dy);
         }
 
         void setPosition(int newX, int newY) {
@@ -113,36 +152,65 @@ public class HelloBorne {
             int y0 = (int) y;
 
             moveTo(hitbox, x0, y0);
-            moveTo(body, x0, y0 + 16);
-            moveTo(torso, x0 + 10, y0 + 24);
-            moveTo(belt, x0 + 10, y0 + 21);
-            moveTo(cape, x0 - 5, y0 + 10);
-            moveTo(head, x0 + 12, y0 + 48);
-            moveTo(eyeL, x0 + 17, y0 + 58);
-            moveTo(eyeR, x0 + 25, y0 + 58);
-            moveTo(brow, x0 + 16, y0 + 62);
-            moveTo(legL, x0 + 12, y0 + 4);
-            moveTo(legR, x0 + 30, y0 + 4);
-            moveTo(bootL, x0 + 11, y0);
-            moveTo(bootR, x0 + 29, y0);
+            moveTo(capeBack, x0 - 5, y0 + 12);
+            moveTo(armorBase, x0 + 8, y0 + 24);
+            moveTo(armorChest, x0 + 14, y0 + 28);
+            moveTo(armorShadow, x0 + 14, y0 + 28);
+            moveTo(belt, x0 + 14, y0 + 24);
+            moveTo(buckle, x0 + 25, y0 + 24);
+            moveTo(shoulderL, x0 + 6, y0 + 45);
+            moveTo(shoulderR, x0 + 42, y0 + 45);
+            moveTo(armL, x0 + 6, y0 + 30);
+            moveTo(armR, x0 + 44, y0 + 30);
+            moveTo(gloveL, x0 + 6, y0 + 24);
+            moveTo(gloveR, x0 + 44, y0 + 24);
+            moveTo(head, x0 + 17, y0 + 58);
+            moveTo(helmetTop, x0 + 15, y0 + 70);
+            moveTo(visor, x0 + 17, y0 + 65);
+            moveTo(plume, x0 + 26, y0 + 76);
+            moveTo(eyeL, x0 + 21, y0 + 62);
+            moveTo(eyeR, x0 + 28, y0 + 62);
+            moveTo(legL, x0 + 17, y0 + 6);
+            moveTo(legR, x0 + 31, y0 + 6);
+            moveTo(bootL, x0 + 16, y0);
+            moveTo(bootR, x0 + 30, y0);
 
             if (dir == DIR_UP) {
-                moveTo(swordGuard, x0 + 18, y0 + 62);
-                moveTo(swordBlade, x0 + 21, y0 + 70);
+                moveTo(swordPommel, x0 + 28, y0 + 58);
+                moveTo(swordGrip, x0 + 28, y0 + 64);
+                moveTo(swordGuard, x0 + 22, y0 + 80);
+                moveTo(swordBladeDark, x0 + 27, y0 + 86);
+                moveTo(swordBladeLight, x0 + 30, y0 + 88);
             } else if (dir == DIR_DOWN) {
-                moveTo(swordGuard, x0 + 18, y0 + 10);
-                moveTo(swordBlade, x0 + 21, y0 - 26);
+                moveTo(swordPommel, x0 + 28, y0 + 22);
+                moveTo(swordGrip, x0 + 28, y0 + 6);
+                moveTo(swordGuard, x0 + 22, y0);
+                moveTo(swordBladeDark, x0 + 27, y0 - 40);
+                moveTo(swordBladeLight, x0 + 30, y0 - 36);
             } else if (dir == DIR_RIGHT) {
-                moveTo(swordGuard, x0 + 50, y0 + 32);
-                moveTo(swordBlade, x0 + 66, y0 + 20);
+                moveTo(swordPommel, x0 + 47, y0 + 35);
+                moveTo(swordGrip, x0 + 53, y0 + 31);
+                moveTo(swordGuard, x0 + 61, y0 + 31);
+                moveTo(swordBladeDark, x0 + 81, y0 + 28);
+                moveTo(swordBladeLight, x0 + 84, y0 + 30);
             } else {
-                moveTo(swordGuard, x0 - 14, y0 + 32);
-                moveTo(swordBlade, x0 - 26, y0 + 20);
+                moveTo(swordPommel, x0 + 5, y0 + 35);
+                moveTo(swordGrip, x0 - 3, y0 + 31);
+                moveTo(swordGuard, x0 - 19, y0 + 31);
+                moveTo(swordBladeDark, x0 - 29, y0 + 28);
+                moveTo(swordBladeLight, x0 - 26, y0 + 30);
             }
         }
 
         Rectangle[] drawable() {
-            return new Rectangle[] {cape, body, torso, belt, legL, legR, bootL, bootR, head, brow, eyeL, eyeR, swordGuard, swordBlade};
+            return new Rectangle[] {
+                capeBack,
+                legL, legR, bootL, bootR,
+                armorBase, armorChest, armorShadow, belt, buckle,
+                shoulderL, shoulderR, armL, armR, gloveL, gloveR,
+                head, helmetTop, visor, plume, eyeL, eyeR,
+                swordPommel, swordGrip, swordGuard, swordBladeDark, swordBladeLight
+            };
         }
     }
 
