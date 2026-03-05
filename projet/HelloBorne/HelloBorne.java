@@ -3,7 +3,6 @@ import MG2D.FenetrePleinEcran;
 import MG2D.geometrie.Point;
 import MG2D.geometrie.Rectangle;
 import MG2D.geometrie.Texte;
-import MG2D.geometrie.Texture;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -24,192 +23,281 @@ public class HelloBorne {
     private static final int ARENA_BOTTOM = 90;
     private static final int ARENA_TOP = 930;
 
-    private static final int PLAYER_W = 66;
-    private static final int PLAYER_H = 82;
-    private static final int ENEMY_W = 62;
-    private static final int ENEMY_H = 62;
+    private static final int PLAYER_W = 54;
+    private static final int PLAYER_H = 72;
+    private static final int ENEMY_W = 48;
+    private static final int ENEMY_H = 52;
 
-    private static final double BASE_PLAYER_SPEED = 5.4;
-    private static final double DASH_SPEED = 13.5;
+    private static final double PLAYER_SPEED = 5.2;
+    private static final double DASH_SPEED = 12.0;
 
-    private static final int ATTACK_RANGE = 180;
-    private static final int ATTACK_ARC_HALF_DEG = 70;
+    private static final int DIR_UP = 0;
+    private static final int DIR_RIGHT = 1;
+    private static final int DIR_DOWN = 2;
+    private static final int DIR_LEFT = 3;
 
     private static final String SCORE_FILE = "projet/HelloBorne/highscore";
 
-    private static final String TEX_OUTSIDE_BG = "projet/InitialDrift/decor/accueil.jpg";
-    private static final String TEX_ARENA_BG = "projet/CursedWare/minigames/TEST_GAME/assets/Background.png";
-    private static final String TEX_PLAYER = "projet/CursedWare/minigames/BroForce/assets/bro.png";
-    private static final String TEX_MONSTER_A = "projet/CursedWare/minigames/TEST_GAME/assets/creature-sheet.png";
-    private static final String TEX_MONSTER_B = "projet/DinoRail/assets/img/bird.png";
-    private static final String TEX_SWORD = "projet/JavaSpace/img/laser/player1/0.png";
-    private static final String TEX_CRATE_A = "projet/InitialDrift/decor/Tonneau.png";
-    private static final String TEX_CRATE_B = "projet/InitialDrift/decor/obj_bags2.png";
-    private static final String TEX_CRATE_C = "projet/InitialDrift/decor/mursac.png";
-    private static final String TEX_FIRE = "projet/InitialDrift/img/explosion.png";
-
-    private static class Entity {
+    private static class Player {
         double x;
         double y;
-        int w;
-        int h;
         Rectangle hitbox;
-        Texture sprite;
-        int lastDrawX;
-        int lastDrawY;
+        Rectangle body;
+        Rectangle cape;
+        Rectangle head;
+        Rectangle eyeL;
+        Rectangle eyeR;
+        Rectangle swordGuard;
+        Rectangle swordBlade;
+        int dir;
 
-        Entity(double x, double y, int w, int h, Rectangle hitbox, Texture sprite) {
+        Player(double x, double y) {
             this.x = x;
             this.y = y;
-            this.w = w;
-            this.h = h;
-            this.hitbox = hitbox;
-            this.sprite = sprite;
-            this.lastDrawX = (int) x;
-            this.lastDrawY = (int) y;
+            this.dir = DIR_UP;
+
+            this.hitbox = rect(0, 0, PLAYER_W, PLAYER_H, Couleur.NOIR);
+            this.body = rect(0, 0, PLAYER_W, 42, Couleur.BLEU);
+            this.cape = rect(0, 0, PLAYER_W + 8, 16, Couleur.ROUGE);
+            this.head = rect(0, 0, 34, 26, Couleur.JAUNE);
+            this.eyeL = rect(0, 0, 6, 6, Couleur.NOIR);
+            this.eyeR = rect(0, 0, 6, 6, Couleur.NOIR);
+            this.swordGuard = rect(0, 0, 18, 8, Couleur.GRIS_CLAIR);
+            this.swordBlade = rect(0, 0, 14, 34, Couleur.BLANC);
+            updateVisual();
         }
-    }
 
-    private static class Enemy extends Entity {
-        int hp;
-        double speed;
-
-        Enemy(double x, double y, int w, int h, Rectangle hitbox, Texture sprite, int hp, double speed) {
-            super(x, y, w, h, hitbox, sprite);
-            this.hp = hp;
-            this.speed = speed;
+        void translate(int dx, int dy) {
+            x += dx;
+            y += dy;
+            hitbox.translater(dx, dy);
+            body.translater(dx, dy);
+            cape.translater(dx, dy);
+            head.translater(dx, dy);
+            eyeL.translater(dx, dy);
+            eyeR.translater(dx, dy);
+            swordGuard.translater(dx, dy);
+            swordBlade.translater(dx, dy);
         }
-    }
 
-    private static class Blocker {
-        Rectangle hitbox;
-        Texture sprite;
-
-        Blocker(Rectangle hitbox, Texture sprite) {
-            this.hitbox = hitbox;
-            this.sprite = sprite;
+        void setPosition(int newX, int newY) {
+            int oldX = left(hitbox);
+            int oldY = bottom(hitbox);
+            translate(newX - oldX, newY - oldY);
         }
-    }
 
-    private static class EffectRect {
-        Rectangle rect;
-        long endAt;
+        void updateVisual() {
+            int x0 = (int) x;
+            int y0 = (int) y;
 
-        EffectRect(Rectangle rect, long endAt) {
-            this.rect = rect;
-            this.endAt = endAt;
-        }
-    }
+            moveTo(hitbox, x0, y0);
+            moveTo(body, x0, y0 + 12);
+            moveTo(cape, x0 - 4, y0 + 4);
+            moveTo(head, x0 + 10, y0 + 44);
+            moveTo(eyeL, x0 + 16, y0 + 58);
+            moveTo(eyeR, x0 + 28, y0 + 58);
 
-    private static class EffectTex {
-        Texture tex;
-        long endAt;
-
-        EffectTex(Texture tex, long endAt) {
-            this.tex = tex;
-            this.endAt = endAt;
-        }
-    }
-
-    private static Rectangle solidRect(Couleur c, int x1, int y1, int x2, int y2) {
-        Rectangle r = new Rectangle(c, new Point(x1, y1), new Point(x2, y2));
-        r.setPlein(true);
-        return r;
-    }
-
-    private static Rectangle buildHitbox(int x, int y, int w, int h) {
-        Rectangle r = new Rectangle(Couleur.NOIR, new Point(x, y), new Point(x + w, y + h));
-        r.setPlein(true);
-        return r;
-    }
-
-    private static Texture buildTextureOrNull(String path, int x, int y, int w, int h) {
-        try {
-            File f = new File(path);
-            if (f.exists()) {
-                return new Texture(path, new Point(x, y), w, h);
+            if (dir == DIR_UP) {
+                moveTo(swordGuard, x0 + 18, y0 + 62);
+                moveTo(swordBlade, x0 + 21, y0 + 70);
+            } else if (dir == DIR_DOWN) {
+                moveTo(swordGuard, x0 + 18, y0 + 10);
+                moveTo(swordBlade, x0 + 21, y0 - 26);
+            } else if (dir == DIR_RIGHT) {
+                moveTo(swordGuard, x0 + 50, y0 + 32);
+                moveTo(swordBlade, x0 + 66, y0 + 20);
+            } else {
+                moveTo(swordGuard, x0 - 14, y0 + 32);
+                moveTo(swordBlade, x0 - 26, y0 + 20);
             }
-        } catch (Exception e) {
-            System.err.println("Texture invalide: " + path + " -> " + e.getMessage());
         }
-        return null;
+
+        Rectangle[] drawable() {
+            return new Rectangle[] {cape, body, head, eyeL, eyeR, swordGuard, swordBlade};
+        }
     }
 
-    private static void moveRectTo(Rectangle r, int left, int bottom) {
-        int cx = Math.min(r.getA().getX(), r.getB().getX());
-        int cy = Math.min(r.getA().getY(), r.getB().getY());
-        r.translater(left - cx, bottom - cy);
+    private static class Enemy {
+        double x;
+        double y;
+        double speed;
+        int hp;
+        Rectangle hitbox;
+        Rectangle body;
+        Rectangle eyeL;
+        Rectangle eyeR;
+        Rectangle jaw;
+
+        Enemy(double x, double y, double speed, int hp, Couleur bodyColor) {
+            this.x = x;
+            this.y = y;
+            this.speed = speed;
+            this.hp = hp;
+
+            this.hitbox = rect((int) x, (int) y, ENEMY_W, ENEMY_H, Couleur.NOIR);
+            this.body = rect((int) x, (int) y, ENEMY_W, ENEMY_H, bodyColor);
+            this.eyeL = rect((int) x + 10, (int) y + 34, 8, 8, Couleur.ROUGE);
+            this.eyeR = rect((int) x + 30, (int) y + 34, 8, 8, Couleur.ROUGE);
+            this.jaw = rect((int) x + 12, (int) y + 10, 24, 8, Couleur.BLANC);
+        }
+
+        void translate(int dx, int dy) {
+            x += dx;
+            y += dy;
+            hitbox.translater(dx, dy);
+            body.translater(dx, dy);
+            eyeL.translater(dx, dy);
+            eyeR.translater(dx, dy);
+            jaw.translater(dx, dy);
+        }
+
+        Rectangle[] drawable() {
+            return new Rectangle[] {body, eyeL, eyeR, jaw};
+        }
     }
 
-    private static void moveTextureTo(Texture t, int left, int bottom) {
-        if (t == null) {
-            return;
+    private static class Obstacle {
+        Rectangle collider;
+        Rectangle box;
+        Rectangle plankH;
+        Rectangle plankV;
+
+        Obstacle(int x, int y, int w, int h) {
+            this.collider = rect(x, y, w, h, Couleur.NOIR);
+            this.box = rect(x, y, w, h, Couleur.ORANGE);
+            this.plankH = rect(x + 4, y + h / 2 - 3, w - 8, 6, Couleur.NOIR);
+            this.plankV = rect(x + w / 2 - 3, y + 4, 6, h - 8, Couleur.NOIR);
         }
-        Rectangle box = t.getBoiteEnglobante();
-        int cx = Math.min(box.getA().getX(), box.getB().getX());
-        int cy = Math.min(box.getA().getY(), box.getB().getY());
-        t.translater(left - cx, bottom - cy);
+
+        Rectangle[] drawable() {
+            return new Rectangle[] {box, plankH, plankV};
+        }
+    }
+
+    private static class Fx {
+        Rectangle shape;
+        long endAt;
+
+        Fx(Rectangle shape, long endAt) {
+            this.shape = shape;
+            this.endAt = endAt;
+        }
+    }
+
+    private static Rectangle rect(int x, int y, int w, int h, Couleur c) {
+        Rectangle r = new Rectangle(c, new Point(x, y), new Point(x + w, y + h));
+        r.setPlein(true);
+        return r;
+    }
+
+    private static void moveTo(Rectangle r, int x, int y) {
+        r.translater(x - left(r), y - bottom(r));
+    }
+
+    private static int left(Rectangle r) {
+        return Math.min(r.getA().getX(), r.getB().getX());
+    }
+
+    private static int right(Rectangle r) {
+        return Math.max(r.getA().getX(), r.getB().getX());
+    }
+
+    private static int bottom(Rectangle r) {
+        return Math.min(r.getA().getY(), r.getB().getY());
+    }
+
+    private static int top(Rectangle r) {
+        return Math.max(r.getA().getY(), r.getB().getY());
     }
 
     private static boolean intersects(Rectangle a, Rectangle b) {
-        int aLeft = Math.min(a.getA().getX(), a.getB().getX());
-        int aRight = Math.max(a.getA().getX(), a.getB().getX());
-        int aBottom = Math.min(a.getA().getY(), a.getB().getY());
-        int aTop = Math.max(a.getA().getY(), a.getB().getY());
-
-        int bLeft = Math.min(b.getA().getX(), b.getB().getX());
-        int bRight = Math.max(b.getA().getX(), b.getB().getX());
-        int bBottom = Math.min(b.getA().getY(), b.getB().getY());
-        int bTop = Math.max(b.getA().getY(), b.getB().getY());
-
-        return aLeft < bRight && aRight > bLeft && aBottom < bTop && aTop > bBottom;
+        return left(a) < right(b) && right(a) > left(b) && bottom(a) < top(b) && top(a) > bottom(b);
     }
 
     private static boolean insideArena(Rectangle r) {
-        int left = Math.min(r.getA().getX(), r.getB().getX());
-        int right = Math.max(r.getA().getX(), r.getB().getX());
-        int bottom = Math.min(r.getA().getY(), r.getB().getY());
-        int top = Math.max(r.getA().getY(), r.getB().getY());
-
-        return left >= ARENA_LEFT && right <= ARENA_RIGHT && bottom >= ARENA_BOTTOM && top <= ARENA_TOP;
+        return left(r) >= ARENA_LEFT && right(r) <= ARENA_RIGHT && bottom(r) >= ARENA_BOTTOM && top(r) <= ARENA_TOP;
     }
 
-    private static boolean collidesAny(Rectangle r, ArrayList<Blocker> blockers) {
-        for (Blocker b : blockers) {
-            if (intersects(r, b.hitbox)) {
+    private static boolean collidesObstacle(Rectangle r, ArrayList<Obstacle> obstacles) {
+        for (Obstacle o : obstacles) {
+            if (intersects(r, o.collider)) {
                 return true;
             }
         }
         return false;
     }
 
-    private static void tryMoveEntity(Entity e, double dx, double dy, ArrayList<Blocker> blockers) {
-        int moveX = (int) Math.round(dx);
-        int moveY = (int) Math.round(dy);
+    private static boolean tryMovePlayer(Player p, int dx, int dy, ArrayList<Obstacle> obstacles) {
+        boolean moved = false;
 
-        if (moveX != 0) {
-            e.hitbox.translater(moveX, 0);
-            if (!insideArena(e.hitbox) || collidesAny(e.hitbox, blockers)) {
-                e.hitbox.translater(-moveX, 0);
+        if (dx != 0) {
+            p.translate(dx, 0);
+            if (!insideArena(p.hitbox) || collidesObstacle(p.hitbox, obstacles)) {
+                p.translate(-dx, 0);
             } else {
-                e.x += moveX;
-                if (e.sprite != null) {
-                    e.sprite.translater(moveX, 0);
-                }
+                moved = true;
             }
         }
 
-        if (moveY != 0) {
-            e.hitbox.translater(0, moveY);
-            if (!insideArena(e.hitbox) || collidesAny(e.hitbox, blockers)) {
-                e.hitbox.translater(0, -moveY);
+        if (dy != 0) {
+            p.translate(0, dy);
+            if (!insideArena(p.hitbox) || collidesObstacle(p.hitbox, obstacles)) {
+                p.translate(0, -dy);
             } else {
-                e.y += moveY;
-                if (e.sprite != null) {
-                    e.sprite.translater(0, moveY);
-                }
+                moved = true;
             }
         }
+
+        return moved;
+    }
+
+    private static boolean tryMoveEnemy(Enemy e, int dx, int dy, ArrayList<Obstacle> obstacles) {
+        boolean moved = false;
+
+        if (dx != 0) {
+            e.translate(dx, 0);
+            if (!insideArena(e.hitbox) || collidesObstacle(e.hitbox, obstacles)) {
+                e.translate(-dx, 0);
+            } else {
+                moved = true;
+            }
+        }
+
+        if (dy != 0) {
+            e.translate(0, dy);
+            if (!insideArena(e.hitbox) || collidesObstacle(e.hitbox, obstacles)) {
+                e.translate(0, -dy);
+            } else {
+                moved = true;
+            }
+        }
+
+        return moved;
+    }
+
+    private static Enemy spawnEnemy(Random rng, int wave) {
+        int side = rng.nextInt(4);
+        int x;
+        int y;
+
+        if (side == 0) {
+            x = ARENA_LEFT + rng.nextInt(ARENA_RIGHT - ARENA_LEFT - ENEMY_W);
+            y = ARENA_TOP - ENEMY_H;
+        } else if (side == 1) {
+            x = ARENA_LEFT + rng.nextInt(ARENA_RIGHT - ARENA_LEFT - ENEMY_W);
+            y = ARENA_BOTTOM;
+        } else if (side == 2) {
+            x = ARENA_LEFT;
+            y = ARENA_BOTTOM + rng.nextInt(ARENA_TOP - ARENA_BOTTOM - ENEMY_H);
+        } else {
+            x = ARENA_RIGHT - ENEMY_W;
+            y = ARENA_BOTTOM + rng.nextInt(ARENA_TOP - ARENA_BOTTOM - ENEMY_H);
+        }
+
+        double speed = Math.min(4.6, 1.4 + wave * 0.2);
+        int hp = 2 + wave / 3;
+        Couleur c = (wave % 3 == 0) ? Couleur.BLEU : (wave % 2 == 0 ? Couleur.ROUGE : Couleur.VERT);
+        return new Enemy(x, y, speed, hp, c);
     }
 
     private static int loadBestScore() {
@@ -242,40 +330,6 @@ public class HelloBorne {
         }
     }
 
-    private static Enemy spawnEnemy(Random rng, int wave) {
-        int side = rng.nextInt(4);
-        int x;
-        int y;
-
-        if (side == 0) {
-            x = ARENA_LEFT + rng.nextInt(ARENA_RIGHT - ARENA_LEFT - ENEMY_W);
-            y = ARENA_TOP + 28;
-        } else if (side == 1) {
-            x = ARENA_LEFT + rng.nextInt(ARENA_RIGHT - ARENA_LEFT - ENEMY_W);
-            y = ARENA_BOTTOM - ENEMY_H - 28;
-        } else if (side == 2) {
-            x = ARENA_LEFT - ENEMY_W - 28;
-            y = ARENA_BOTTOM + rng.nextInt(ARENA_TOP - ARENA_BOTTOM - ENEMY_H);
-        } else {
-            x = ARENA_RIGHT + 28;
-            y = ARENA_BOTTOM + rng.nextInt(ARENA_TOP - ARENA_BOTTOM - ENEMY_H);
-        }
-
-        Rectangle hit = buildHitbox(x, y, ENEMY_W, ENEMY_H);
-        String texPath = rng.nextBoolean() ? TEX_MONSTER_A : TEX_MONSTER_B;
-        Texture spr = buildTextureOrNull(texPath, x, y, ENEMY_W, ENEMY_H);
-
-        double speed = Math.min(4.9, 1.8 + wave * 0.17);
-        int hp = 2 + (wave / 4);
-        return new Enemy(x, y, ENEMY_W, ENEMY_H, hit, spr, hp, speed);
-    }
-
-    private static Blocker createBlocker(String texturePath, int x, int y, int w, int h) {
-        Rectangle hit = buildHitbox(x, y, w, h);
-        Texture spr = buildTextureOrNull(texturePath, x, y, w, h);
-        return new Blocker(hit, spr);
-    }
-
     public static void main(String[] args) {
         FenetrePleinEcran f = new FenetrePleinEcran("Dungeon Blitz");
         f.setVisible(true);
@@ -287,90 +341,69 @@ public class HelloBorne {
             f.getP().requestFocusInWindow();
         }
 
-        Texture outsideBg = buildTextureOrNull(TEX_OUTSIDE_BG, 0, 0, W, H);
-        Texture arenaBg = buildTextureOrNull(TEX_ARENA_BG, ARENA_LEFT, ARENA_BOTTOM, ARENA_RIGHT - ARENA_LEFT, ARENA_TOP - ARENA_BOTTOM);
+        Rectangle bg = rect(0, 0, W, H, Couleur.NOIR);
+        Rectangle arena = rect(ARENA_LEFT, ARENA_BOTTOM, ARENA_RIGHT - ARENA_LEFT, ARENA_TOP - ARENA_BOTTOM, Couleur.GRIS_FONCE);
+        Rectangle wallTop = rect(ARENA_LEFT - 20, ARENA_TOP, ARENA_RIGHT - ARENA_LEFT + 40, 24, Couleur.GRIS);
+        Rectangle wallBottom = rect(ARENA_LEFT - 20, ARENA_BOTTOM - 24, ARENA_RIGHT - ARENA_LEFT + 40, 24, Couleur.GRIS);
+        Rectangle wallLeft = rect(ARENA_LEFT - 24, ARENA_BOTTOM, 24, ARENA_TOP - ARENA_BOTTOM, Couleur.GRIS);
+        Rectangle wallRight = rect(ARENA_RIGHT, ARENA_BOTTOM, 24, ARENA_TOP - ARENA_BOTTOM, Couleur.GRIS);
 
-        Rectangle outsideFallback = solidRect(Couleur.NOIR, 0, 0, W, H);
-        Rectangle arenaFallback = solidRect(Couleur.GRIS_FONCE, ARENA_LEFT, ARENA_BOTTOM, ARENA_RIGHT, ARENA_TOP);
-
-        Rectangle wallTop = solidRect(Couleur.GRIS, ARENA_LEFT - 18, ARENA_TOP, ARENA_RIGHT + 18, ARENA_TOP + 24);
-        Rectangle wallBottom = solidRect(Couleur.GRIS, ARENA_LEFT - 18, ARENA_BOTTOM - 24, ARENA_RIGHT + 18, ARENA_BOTTOM);
-        Rectangle wallLeft = solidRect(Couleur.GRIS, ARENA_LEFT - 24, ARENA_BOTTOM, ARENA_LEFT, ARENA_TOP);
-        Rectangle wallRight = solidRect(Couleur.GRIS, ARENA_RIGHT, ARENA_BOTTOM, ARENA_RIGHT + 24, ARENA_TOP);
-
-        ArrayList<Rectangle> floorPattern = new ArrayList<>();
-        int tSize = 84;
-        for (int x = ARENA_LEFT; x < ARENA_RIGHT; x += tSize) {
-            for (int y = ARENA_BOTTOM; y < ARENA_TOP; y += tSize) {
-                Couleur c = (((x / tSize) + (y / tSize)) % 2 == 0) ? Couleur.GRIS_FONCE : Couleur.GRIS;
-                Rectangle tile = solidRect(c, x, y, Math.min(x + tSize, ARENA_RIGHT), Math.min(y + tSize, ARENA_TOP));
-                tile.setCouleur(c == Couleur.GRIS ? Couleur.GRIS : Couleur.GRIS_FONCE);
-                floorPattern.add(tile);
+        ArrayList<Rectangle> floorTiles = new ArrayList<>();
+        int tile = 70;
+        for (int x = ARENA_LEFT; x < ARENA_RIGHT; x += tile) {
+            for (int y = ARENA_BOTTOM; y < ARENA_TOP; y += tile) {
+                Couleur c = (((x / tile) + (y / tile)) % 2 == 0) ? Couleur.GRIS_FONCE : Couleur.GRIS;
+                floorTiles.add(rect(x, y, Math.min(tile, ARENA_RIGHT - x), Math.min(tile, ARENA_TOP - y), c));
             }
         }
 
-        int px = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
-        int py = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
-        Entity player = new Entity(px, py, PLAYER_W, PLAYER_H, buildHitbox(px, py, PLAYER_W, PLAYER_H), buildTextureOrNull(TEX_PLAYER, px, py, PLAYER_W, PLAYER_H));
-        Rectangle playerFallback = solidRect(Couleur.BLEU, px, py, px + PLAYER_W, py + PLAYER_H);
+        ArrayList<Obstacle> obstacles = new ArrayList<>();
+        obstacles.add(new Obstacle(250, 210, 86, 76));
+        obstacles.add(new Obstacle(430, 260, 92, 80));
+        obstacles.add(new Obstacle(590, 395, 90, 84));
+        obstacles.add(new Obstacle(760, 280, 106, 82));
+        obstacles.add(new Obstacle(940, 240, 86, 76));
+        obstacles.add(new Obstacle(340, 640, 92, 80));
+        obstacles.add(new Obstacle(540, 742, 96, 82));
+        obstacles.add(new Obstacle(760, 625, 92, 80));
+        obstacles.add(new Obstacle(915, 706, 96, 82));
 
-        ArrayList<Blocker> blockers = new ArrayList<>();
-        blockers.add(createBlocker(TEX_CRATE_A, 290, 220, 72, 72));
-        blockers.add(createBlocker(TEX_CRATE_B, 435, 265, 84, 60));
-        blockers.add(createBlocker(TEX_CRATE_A, 560, 400, 72, 72));
-        blockers.add(createBlocker(TEX_CRATE_C, 720, 300, 110, 70));
-        blockers.add(createBlocker(TEX_CRATE_A, 910, 250, 72, 72));
-        blockers.add(createBlocker(TEX_CRATE_B, 360, 650, 90, 64));
-        blockers.add(createBlocker(TEX_CRATE_C, 545, 735, 110, 70));
-        blockers.add(createBlocker(TEX_CRATE_A, 770, 620, 72, 72));
-        blockers.add(createBlocker(TEX_CRATE_B, 940, 705, 88, 64));
-
-        Rectangle slashFallback = solidRect(Couleur.JAUNE, -200, -200, -150, -150);
-        moveRectTo(slashFallback, -300, -300);
+        int startX = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
+        int startY = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
+        Player player = new Player(startX, startY);
 
         Font titleFont = new Font("Calibri", Font.BOLD, 40);
         Font hudFont = new Font("Calibri", Font.BOLD, 28);
-        Font infoFont = new Font("Calibri", Font.PLAIN, 23);
+        Font smallFont = new Font("Calibri", Font.PLAIN, 24);
 
         Texte title = new Texte(Couleur.BLANC, "DUNGEON BLITZ", titleFont, new Point(W / 2, 982));
-        Texte scoreTxt = new Texte(Couleur.BLANC, "Score: 0", hudFont, new Point(145, 982));
+        Texte scoreTxt = new Texte(Couleur.BLANC, "Score: 0", hudFont, new Point(130, 982));
         int bestScore = loadBestScore();
-        Texte bestTxt = new Texte(Couleur.BLANC, "Best: " + bestScore, hudFont, new Point(1120, 982));
-        Texte hpTxt = new Texte(Couleur.ROUGE, "HP: 6", hudFont, new Point(145, 944));
+        Texte bestTxt = new Texte(Couleur.BLANC, "Best: " + bestScore, hudFont, new Point(1130, 982));
+        Texte hpTxt = new Texte(Couleur.ROUGE, "HP: 6", hudFont, new Point(130, 944));
         Texte waveTxt = new Texte(Couleur.JAUNE, "Wave: 1", hudFont, new Point(W / 2, 944));
-        Texte coolTxt = new Texte(Couleur.CYAN, "Dash(B): ready | Nova(C): ready", infoFont, new Point(W / 2, 908));
-        Texte helpTxt = new Texte(Couleur.GRIS_CLAIR, "J1 stick: bouger | A: epee longue | B: dash | C: nova | Z: quitter", infoFont, new Point(W / 2, 42));
+        Texte coolTxt = new Texte(Couleur.CYAN, "Dash(B): ready | Nova(C): ready", smallFont, new Point(W / 2, 908));
+        Texte helpTxt = new Texte(Couleur.GRIS_CLAIR, "J1 stick: bouger | A: epee longue | B: dash | C: nova | Z: quitter", smallFont, new Point(W / 2, 42));
         Texte infoTxt = new Texte(Couleur.JAUNE, "", hudFont, new Point(W / 2, 520));
 
-        f.ajouter(outsideFallback);
-        if (outsideBg != null) {
-            f.ajouter(outsideBg);
-        }
-        for (Rectangle tile : floorPattern) {
-            f.ajouter(tile);
-        }
-        f.ajouter(arenaFallback);
-        if (arenaBg != null) {
-            f.ajouter(arenaBg);
+        f.ajouter(bg);
+        f.ajouter(arena);
+        for (Rectangle t : floorTiles) {
+            f.ajouter(t);
         }
         f.ajouter(wallTop);
         f.ajouter(wallBottom);
         f.ajouter(wallLeft);
         f.ajouter(wallRight);
 
-        for (Blocker b : blockers) {
-            if (b.sprite != null) {
-                f.ajouter(b.sprite);
-            } else {
-                Rectangle fallbackBox = solidRect(Couleur.ORANGE, Math.min(b.hitbox.getA().getX(), b.hitbox.getB().getX()), Math.min(b.hitbox.getA().getY(), b.hitbox.getB().getY()), Math.max(b.hitbox.getA().getX(), b.hitbox.getB().getX()), Math.max(b.hitbox.getA().getY(), b.hitbox.getB().getY()));
-                f.ajouter(fallbackBox);
+        for (Obstacle o : obstacles) {
+            for (Rectangle r : o.drawable()) {
+                f.ajouter(r);
             }
         }
 
-        if (player.sprite != null) {
-            f.ajouter(player.sprite);
-        } else {
-            f.ajouter(playerFallback);
+        for (Rectangle r : player.drawable()) {
+            f.ajouter(r);
         }
 
         f.ajouter(title);
@@ -383,8 +416,7 @@ public class HelloBorne {
         f.ajouter(infoTxt);
 
         ArrayList<Enemy> enemies = new ArrayList<>();
-        ArrayList<EffectRect> fxRects = new ArrayList<>();
-        ArrayList<EffectTex> fxTex = new ArrayList<>();
+        ArrayList<Fx> effects = new ArrayList<>();
         Random rng = new Random();
 
         long start = System.currentTimeMillis();
@@ -394,9 +426,6 @@ public class HelloBorne {
         long lastDash = 0;
         long lastNova = 0;
         long lastHit = 0;
-
-        double facingX = 0.0;
-        double facingY = 1.0;
 
         int hp = 6;
         int score = 0;
@@ -417,57 +446,40 @@ public class HelloBorne {
             int wave = 1 + (int) ((now - start) / 18000);
             waveTxt.setTexte("Wave: " + wave);
 
-            long dashCd = Math.max(500, 900 - wave * 15);
+            long dashCd = Math.max(520, 900 - wave * 12);
             long novaCd = 3000;
             String dashStatus = (now - lastDash >= dashCd) ? "ready" : ("" + ((dashCd - (now - lastDash)) / 1000 + 1) + "s");
             String novaStatus = (now - lastNova >= novaCd) ? "ready" : ("" + ((novaCd - (now - lastNova)) / 1000 + 1) + "s");
             coolTxt.setTexte("Dash(B): " + dashStatus + " | Nova(C): " + novaStatus);
 
-            Iterator<EffectRect> itFr = fxRects.iterator();
-            while (itFr.hasNext()) {
-                EffectRect fx = itFr.next();
+            Iterator<Fx> itFx = effects.iterator();
+            while (itFx.hasNext()) {
+                Fx fx = itFx.next();
                 if (now >= fx.endAt) {
-                    f.supprimer(fx.rect);
-                    itFr.remove();
-                }
-            }
-
-            Iterator<EffectTex> itFt = fxTex.iterator();
-            while (itFt.hasNext()) {
-                EffectTex fx = itFt.next();
-                if (now >= fx.endAt) {
-                    f.supprimer(fx.tex);
-                    itFt.remove();
+                    f.supprimer(fx.shape);
+                    itFx.remove();
                 }
             }
 
             if (gameOver) {
                 if (clavier.getBoutonJ1ATape()) {
                     for (Enemy e : enemies) {
-                        if (e.sprite != null) {
-                            f.supprimer(e.sprite);
-                        }
-                        if (e.hitbox != null) {
-                            // Hitbox non ajoutee a la fenetre
+                        for (Rectangle r : e.drawable()) {
+                            f.supprimer(r);
                         }
                     }
                     enemies.clear();
 
-                    for (EffectRect fx : fxRects) {
-                        f.supprimer(fx.rect);
+                    for (Fx fx : effects) {
+                        f.supprimer(fx.shape);
                     }
-                    fxRects.clear();
+                    effects.clear();
 
-                    for (EffectTex fx : fxTex) {
-                        f.supprimer(fx.tex);
-                    }
-                    fxTex.clear();
-
-                    px = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
-                    py = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
-                    moveRectTo(player.hitbox, px, py);
-                    moveTextureTo(player.sprite, px, py);
-                    moveRectTo(playerFallback, px, py);
+                    int resetX = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
+                    int resetY = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
+                    player.setPosition(resetX, resetY);
+                    player.dir = DIR_UP;
+                    player.updateVisual();
 
                     hp = 6;
                     score = 0;
@@ -478,95 +490,84 @@ public class HelloBorne {
                     lastDash = 0;
                     lastNova = 0;
                     lastHit = 0;
-                    facingX = 0;
-                    facingY = 1;
 
                     hpTxt.setTexte("HP: 6");
                     scoreTxt.setTexte("Score: 0");
                     infoTxt.setTexte("");
                     gameOver = false;
                 }
+
                 f.rafraichir();
                 continue;
             }
 
-            double mx = 0;
-            double my = 0;
+            double mx = 0.0;
+            double my = 0.0;
             if (clavier.getJoyJ1GaucheEnfoncee()) {
                 mx -= 1.0;
+                player.dir = DIR_LEFT;
             }
             if (clavier.getJoyJ1DroiteEnfoncee()) {
                 mx += 1.0;
+                player.dir = DIR_RIGHT;
             }
             if (clavier.getJoyJ1HautEnfoncee()) {
                 my += 1.0;
+                player.dir = DIR_UP;
             }
             if (clavier.getJoyJ1BasEnfoncee()) {
                 my -= 1.0;
+                player.dir = DIR_DOWN;
             }
 
             double norm = Math.sqrt(mx * mx + my * my);
             if (norm > 0.0001) {
                 mx /= norm;
                 my /= norm;
-                facingX = mx;
-                facingY = my;
             }
 
             if (clavier.getBoutonJ1BTape() && now - lastDash >= dashCd) {
                 lastDash = now;
             }
 
-            double currentSpeed = (now - lastDash < 140) ? DASH_SPEED : BASE_PLAYER_SPEED;
-            tryMoveEntity(player, mx * currentSpeed, my * currentSpeed, blockers);
+            double speed = (now - lastDash < 140) ? DASH_SPEED : PLAYER_SPEED;
+            int dx = (int) Math.round(mx * speed);
+            int dy = (int) Math.round(my * speed);
+            tryMovePlayer(player, dx, dy, obstacles);
+            player.updateVisual();
 
-            if (player.sprite == null) {
-                moveRectTo(playerFallback, (int) player.x, (int) player.y);
-            }
-
-            if (clavier.getBoutonJ1ATape() && now - lastAttack > 210) {
+            if (clavier.getBoutonJ1ATape() && now - lastAttack >= 210) {
                 lastAttack = now;
 
-                int cx = (int) player.x + PLAYER_W / 2;
-                int cy = (int) player.y + PLAYER_H / 2;
+                int cx = left(player.hitbox) + PLAYER_W / 2;
+                int cy = bottom(player.hitbox) + PLAYER_H / 2;
+                Rectangle slash;
 
-                int swordX = cx + (int) (facingX * 92) - 26;
-                int swordY = cy + (int) (facingY * 92) - 26;
-                Texture swordFx = buildTextureOrNull(TEX_SWORD, swordX, swordY, 52, 52);
-                if (swordFx != null) {
-                    f.ajouter(swordFx);
-                    fxTex.add(new EffectTex(swordFx, now + 120));
+                if (player.dir == DIR_UP) {
+                    slash = rect(cx - 58, cy + 18, 116, ATTACK_RANGE, Couleur.JAUNE);
+                } else if (player.dir == DIR_DOWN) {
+                    slash = rect(cx - 58, cy - ATTACK_RANGE - 18, 116, ATTACK_RANGE, Couleur.JAUNE);
+                } else if (player.dir == DIR_RIGHT) {
+                    slash = rect(cx + 18, cy - 58, ATTACK_RANGE, 116, Couleur.JAUNE);
                 } else {
-                    Rectangle slash = solidRect(Couleur.JAUNE, swordX, swordY, swordX + 52, swordY + 52);
-                    f.ajouter(slash);
-                    fxRects.add(new EffectRect(slash, now + 120));
+                    slash = rect(cx - ATTACK_RANGE - 18, cy - 58, ATTACK_RANGE, 116, Couleur.JAUNE);
                 }
 
-                Iterator<Enemy> itE = enemies.iterator();
-                while (itE.hasNext()) {
-                    Enemy e = itE.next();
-                    int ex = (int) e.x + ENEMY_W / 2;
-                    int ey = (int) e.y + ENEMY_H / 2;
-                    double dx = ex - cx;
-                    double dy = ey - cy;
-                    double d = Math.sqrt(dx * dx + dy * dy);
-                    if (d <= ATTACK_RANGE) {
-                        double dot = (dx * facingX + dy * facingY) / (d + 0.0001);
-                        double threshold = Math.cos(Math.toRadians(ATTACK_ARC_HALF_DEG));
-                        if (dot >= threshold) {
-                            e.hp -= 1;
-                            if (e.hp <= 0) {
-                                if (e.sprite != null) {
-                                    f.supprimer(e.sprite);
-                                }
-                                Texture fireFx = buildTextureOrNull(TEX_FIRE, (int) e.x - 10, (int) e.y - 10, ENEMY_W + 20, ENEMY_H + 20);
-                                if (fireFx != null) {
-                                    f.ajouter(fireFx);
-                                    fxTex.add(new EffectTex(fireFx, now + 140));
-                                }
-                                itE.remove();
-                                score += 25;
+                f.ajouter(slash);
+                effects.add(new Fx(slash, now + 100));
+
+                Iterator<Enemy> it = enemies.iterator();
+                while (it.hasNext()) {
+                    Enemy e = it.next();
+                    if (intersects(slash, e.hitbox)) {
+                        e.hp -= 1;
+                        e.body.setCouleur(Couleur.ORANGE);
+                        if (e.hp <= 0) {
+                            for (Rectangle r : e.drawable()) {
+                                f.supprimer(r);
                             }
+                            it.remove();
+                            score += 24;
                         }
                     }
                 }
@@ -574,81 +575,57 @@ public class HelloBorne {
 
             if (clavier.getBoutonJ1CTape() && now - lastNova >= novaCd) {
                 lastNova = now;
-                int cx = (int) player.x + PLAYER_W / 2;
-                int cy = (int) player.y + PLAYER_H / 2;
-                Rectangle nova = solidRect(Couleur.CYAN, cx - 165, cy - 165, cx + 165, cy + 165);
+                int cx = left(player.hitbox) + PLAYER_W / 2;
+                int cy = bottom(player.hitbox) + PLAYER_H / 2;
+                Rectangle nova = rect(cx - 175, cy - 175, 350, 350, Couleur.CYAN);
                 f.ajouter(nova);
-                fxRects.add(new EffectRect(nova, now + 120));
+                effects.add(new Fx(nova, now + 110));
 
-                Iterator<Enemy> itE = enemies.iterator();
-                while (itE.hasNext()) {
-                    Enemy e = itE.next();
-                    int ex = (int) e.x + ENEMY_W / 2;
-                    int ey = (int) e.y + ENEMY_H / 2;
-                    double dx = ex - cx;
-                    double dy = ey - cy;
-                    if (Math.sqrt(dx * dx + dy * dy) <= 175) {
-                        if (e.sprite != null) {
-                            f.supprimer(e.sprite);
+                Iterator<Enemy> it = enemies.iterator();
+                while (it.hasNext()) {
+                    Enemy e = it.next();
+                    if (intersects(nova, e.hitbox)) {
+                        for (Rectangle r : e.drawable()) {
+                            f.supprimer(r);
                         }
-                        itE.remove();
+                        it.remove();
                         score += 30;
                     }
                 }
             }
 
-            int maxEnemies = 5 + wave * 2;
-            int spawnDelay = Math.max(190, 1020 - wave * 52);
+            int maxEnemies = 4 + wave * 2;
+            int spawnDelay = Math.max(210, 980 - wave * 46);
             if (enemies.size() < maxEnemies && now - lastSpawn >= spawnDelay) {
                 Enemy e = spawnEnemy(rng, wave);
                 enemies.add(e);
-                if (e.sprite != null) {
-                    f.ajouter(e.sprite);
-                } else {
-                    Rectangle fallback = solidRect(Couleur.ROUGE, (int) e.x, (int) e.y, (int) e.x + ENEMY_W, (int) e.y + ENEMY_H);
-                    e.sprite = null;
-                    e.hitbox = buildHitbox((int) e.x, (int) e.y, ENEMY_W, ENEMY_H);
-                    f.ajouter(fallback);
+                for (Rectangle r : e.drawable()) {
+                    f.ajouter(r);
                 }
                 lastSpawn = now;
             }
 
             for (Enemy e : enemies) {
-                double pcx = player.x + PLAYER_W / 2.0;
-                double pcy = player.y + PLAYER_H / 2.0;
-                double ecx = e.x + ENEMY_W / 2.0;
-                double ecy = e.y + ENEMY_H / 2.0;
+                double pxCenter = left(player.hitbox) + PLAYER_W / 2.0;
+                double pyCenter = bottom(player.hitbox) + PLAYER_H / 2.0;
+                double exCenter = left(e.hitbox) + ENEMY_W / 2.0;
+                double eyCenter = bottom(e.hitbox) + ENEMY_H / 2.0;
 
-                double dx = pcx - ecx;
-                double dy = pcy - ecy;
-                double d = Math.sqrt(dx * dx + dy * dy);
+                double tx = pxCenter - exCenter;
+                double ty = pyCenter - eyCenter;
+                double d = Math.sqrt(tx * tx + ty * ty);
                 if (d > 0.001) {
-                    dx /= d;
-                    dy /= d;
+                    tx /= d;
+                    ty /= d;
                 }
 
-                int beforeX = (int) e.x;
-                int beforeY = (int) e.y;
-                e.x += dx * e.speed;
-                e.y += dy * e.speed;
-
-                moveRectTo(e.hitbox, (int) e.x, (int) e.y);
-                if (!insideArena(e.hitbox) || collidesAny(e.hitbox, blockers)) {
-                    e.x = beforeX;
-                    e.y = beforeY;
-                    moveRectTo(e.hitbox, beforeX, beforeY);
-                    e.x += (rng.nextBoolean() ? 1 : -1) * 1.5;
-                    e.y += (rng.nextBoolean() ? 1 : -1) * 1.5;
-                    moveRectTo(e.hitbox, (int) e.x, (int) e.y);
-                    if (!insideArena(e.hitbox) || collidesAny(e.hitbox, blockers)) {
-                        e.x = beforeX;
-                        e.y = beforeY;
-                        moveRectTo(e.hitbox, beforeX, beforeY);
-                    }
-                }
-
-                if (e.sprite != null) {
-                    moveTextureTo(e.sprite, (int) e.x, (int) e.y);
+                int mdx = (int) Math.round(tx * e.speed);
+                int mdy = (int) Math.round(ty * e.speed);
+                boolean moved = tryMoveEnemy(e, mdx, mdy, obstacles);
+                if (!moved) {
+                    int sdx = rng.nextBoolean() ? 2 : -2;
+                    int sdy = rng.nextBoolean() ? 2 : -2;
+                    tryMoveEnemy(e, sdx, sdy, obstacles);
                 }
             }
 
@@ -658,9 +635,9 @@ public class HelloBorne {
                         hp -= 1;
                         hpTxt.setTexte("HP: " + hp);
                         lastHit = now;
-                        Rectangle hitFx = solidRect(Couleur.ROUGE, (int) player.x - 12, (int) player.y - 12, (int) player.x + PLAYER_W + 12, (int) player.y + PLAYER_H + 12);
+                        Rectangle hitFx = rect(left(player.hitbox) - 12, bottom(player.hitbox) - 12, PLAYER_W + 24, PLAYER_H + 24, Couleur.ROUGE);
                         f.ajouter(hitFx);
-                        fxRects.add(new EffectRect(hitFx, now + 110));
+                        effects.add(new Fx(hitFx, now + 110));
                         break;
                     }
                 }
