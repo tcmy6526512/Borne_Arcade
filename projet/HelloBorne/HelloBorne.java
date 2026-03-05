@@ -362,7 +362,7 @@ public class HelloBorne {
             if (b.sprite != null) {
                 f.ajouter(b.sprite);
             } else {
-                Rectangle fallbackBox = solidRect(Couleur.MARRON, Math.min(b.hitbox.getA().getX(), b.hitbox.getB().getX()), Math.min(b.hitbox.getA().getY(), b.hitbox.getB().getY()), Math.max(b.hitbox.getA().getX(), b.hitbox.getB().getX()), Math.max(b.hitbox.getA().getY(), b.hitbox.getB().getY()));
+                Rectangle fallbackBox = solidRect(Couleur.ORANGE, Math.min(b.hitbox.getA().getX(), b.hitbox.getB().getX()), Math.min(b.hitbox.getA().getY(), b.hitbox.getB().getY()), Math.max(b.hitbox.getA().getX(), b.hitbox.getB().getX()), Math.max(b.hitbox.getA().getY(), b.hitbox.getB().getY()));
                 f.ajouter(fallbackBox);
             }
         }
