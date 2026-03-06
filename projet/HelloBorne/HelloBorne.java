@@ -198,7 +198,7 @@ public class HelloBorne {
                 moveTo(swordGripH, -300, -300);
                 moveTo(swordGuardH, -300, -300);
                 moveTo(swordBladeVDark, x0 + 27, y0 + 86);
-                moveTo(swordBladeVLight, x0 + 30, y0 + 88);
+                moveTo(swordBladeVLight, x0 + 30, y0 + 86);
                 moveTo(swordBladeHDark, -300, -300);
                 moveTo(swordBladeHLight, -300, -300);
             } else if (dir == DIR_DOWN) {
@@ -209,7 +209,7 @@ public class HelloBorne {
                 moveTo(swordGripH, -300, -300);
                 moveTo(swordGuardH, -300, -300);
                 moveTo(swordBladeVDark, x0 + 27, y0 - 40);
-                moveTo(swordBladeVLight, x0 + 30, y0 - 36);
+                moveTo(swordBladeVLight, x0 + 30, y0 - 40);
                 moveTo(swordBladeHDark, -300, -300);
                 moveTo(swordBladeHLight, -300, -300);
             } else if (dir == DIR_RIGHT) {
@@ -219,8 +219,8 @@ public class HelloBorne {
                 moveTo(swordPommelH, x0 + 49, y0 + 34);
                 moveTo(swordGripH, x0 + 55, y0 + 34);
                 moveTo(swordGuardH, x0 + 71, y0 + 28);
-                moveTo(swordBladeHDark, x0 + 81, y0 + 28);
-                moveTo(swordBladeHLight, x0 + 83, y0 + 31);
+                moveTo(swordBladeHDark, x0 + 77, y0 + 33);
+                moveTo(swordBladeHLight, x0 + 77, y0 + 36);
                 moveTo(swordBladeVDark, -300, -300);
                 moveTo(swordBladeVLight, -300, -300);
             } else {
@@ -230,8 +230,8 @@ public class HelloBorne {
                 moveTo(swordPommelH, x0 + 5, y0 + 34);
                 moveTo(swordGripH, x0 - 11, y0 + 34);
                 moveTo(swordGuardH, x0 - 17, y0 + 28);
-                moveTo(swordBladeHDark, x0 - 59, y0 + 28);
-                moveTo(swordBladeHLight, x0 - 55, y0 + 31);
+                moveTo(swordBladeHDark, x0 - 57, y0 + 33);
+                moveTo(swordBladeHLight, x0 - 53, y0 + 36);
                 moveTo(swordBladeVDark, -300, -300);
                 moveTo(swordBladeVLight, -300, -300);
             }
