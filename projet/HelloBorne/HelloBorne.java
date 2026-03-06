@@ -68,8 +68,10 @@ public class HelloBorne {
         Rectangle swordPommel;
         Rectangle swordGrip;
         Rectangle swordGuard;
-        Rectangle swordBladeDark;
-        Rectangle swordBladeLight;
+        Rectangle swordBladeVDark;
+        Rectangle swordBladeVLight;
+        Rectangle swordBladeHDark;
+        Rectangle swordBladeHLight;
         int dir;
 
         Player(double x, double y) {
@@ -103,8 +105,10 @@ public class HelloBorne {
             this.swordPommel = rect(0, 0, 8, 6, Couleur.JAUNE);
             this.swordGrip = rect(0, 0, 8, 16, Couleur.ORANGE);
             this.swordGuard = rect(0, 0, 20, 6, Couleur.JAUNE);
-            this.swordBladeDark = rect(0, 0, 10, 40, Couleur.GRIS);
-            this.swordBladeLight = rect(0, 0, 4, 36, Couleur.BLANC);
+            this.swordBladeVDark = rect(0, 0, 10, 40, Couleur.GRIS);
+            this.swordBladeVLight = rect(0, 0, 4, 36, Couleur.BLANC);
+            this.swordBladeHDark = rect(0, 0, 40, 10, Couleur.GRIS);
+            this.swordBladeHLight = rect(0, 0, 36, 4, Couleur.BLANC);
             updateVisual();
         }
 
@@ -137,8 +141,10 @@ public class HelloBorne {
             swordPommel.translater(dx, dy);
             swordGrip.translater(dx, dy);
             swordGuard.translater(dx, dy);
-            swordBladeDark.translater(dx, dy);
-            swordBladeLight.translater(dx, dy);
+            swordBladeVDark.translater(dx, dy);
+            swordBladeVLight.translater(dx, dy);
+            swordBladeHDark.translater(dx, dy);
+            swordBladeHLight.translater(dx, dy);
         }
 
         void setPosition(int newX, int newY) {
@@ -179,26 +185,34 @@ public class HelloBorne {
                 moveTo(swordPommel, x0 + 28, y0 + 58);
                 moveTo(swordGrip, x0 + 28, y0 + 64);
                 moveTo(swordGuard, x0 + 22, y0 + 80);
-                moveTo(swordBladeDark, x0 + 27, y0 + 86);
-                moveTo(swordBladeLight, x0 + 30, y0 + 88);
+                moveTo(swordBladeVDark, x0 + 27, y0 + 86);
+                moveTo(swordBladeVLight, x0 + 30, y0 + 88);
+                moveTo(swordBladeHDark, -300, -300);
+                moveTo(swordBladeHLight, -300, -300);
             } else if (dir == DIR_DOWN) {
                 moveTo(swordPommel, x0 + 28, y0 + 22);
                 moveTo(swordGrip, x0 + 28, y0 + 6);
                 moveTo(swordGuard, x0 + 22, y0);
-                moveTo(swordBladeDark, x0 + 27, y0 - 40);
-                moveTo(swordBladeLight, x0 + 30, y0 - 36);
+                moveTo(swordBladeVDark, x0 + 27, y0 - 40);
+                moveTo(swordBladeVLight, x0 + 30, y0 - 36);
+                moveTo(swordBladeHDark, -300, -300);
+                moveTo(swordBladeHLight, -300, -300);
             } else if (dir == DIR_RIGHT) {
                 moveTo(swordPommel, x0 + 47, y0 + 35);
                 moveTo(swordGrip, x0 + 53, y0 + 31);
                 moveTo(swordGuard, x0 + 61, y0 + 31);
-                moveTo(swordBladeDark, x0 + 81, y0 + 28);
-                moveTo(swordBladeLight, x0 + 84, y0 + 30);
+                moveTo(swordBladeHDark, x0 + 81, y0 + 28);
+                moveTo(swordBladeHLight, x0 + 83, y0 + 31);
+                moveTo(swordBladeVDark, -300, -300);
+                moveTo(swordBladeVLight, -300, -300);
             } else {
                 moveTo(swordPommel, x0 + 5, y0 + 35);
                 moveTo(swordGrip, x0 - 3, y0 + 31);
                 moveTo(swordGuard, x0 - 19, y0 + 31);
-                moveTo(swordBladeDark, x0 - 29, y0 + 28);
-                moveTo(swordBladeLight, x0 - 26, y0 + 30);
+                moveTo(swordBladeHDark, x0 - 59, y0 + 28);
+                moveTo(swordBladeHLight, x0 - 55, y0 + 31);
+                moveTo(swordBladeVDark, -300, -300);
+                moveTo(swordBladeVLight, -300, -300);
             }
         }
 
@@ -209,7 +223,7 @@ public class HelloBorne {
                 armorBase, armorChest, armorShadow, belt, buckle,
                 shoulderL, shoulderR, armL, armR, gloveL, gloveR,
                 head, helmetTop, visor, plume, eyeL, eyeR,
-                swordPommel, swordGrip, swordGuard, swordBladeDark, swordBladeLight
+                swordPommel, swordGrip, swordGuard, swordBladeVDark, swordBladeVLight, swordBladeHDark, swordBladeHLight
             };
         }
     }
@@ -482,8 +496,8 @@ public class HelloBorne {
         obstacles.add(new Obstacle(760, 625, 92, 80));
         obstacles.add(new Obstacle(915, 706, 96, 82));
 
-        int startX = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
-        int startY = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
+        int startX = ARENA_LEFT + 70;
+        int startY = ARENA_BOTTOM + 70;
         Player player = new Player(startX, startY);
 
         Font titleFont = new Font("Calibri", Font.BOLD, 40);
@@ -591,8 +605,8 @@ public class HelloBorne {
                     }
                     effects.clear();
 
-                    int resetX = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
-                    int resetY = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
+                    int resetX = ARENA_LEFT + 70;
+                    int resetY = ARENA_BOTTOM + 70;
                     player.setPosition(resetX, resetY);
                     player.dir = DIR_UP;
                     player.updateVisual();
@@ -622,19 +636,19 @@ public class HelloBorne {
 
             double mx = 0.0;
             double my = 0.0;
-            if (clavier.getJoyJ1GaucheEnfoncee()) {
+            if (clavier.getJoyJ1GaucheEnfoncee() || clavier.getJoyJ1GaucheTape()) {
                 mx -= 1.0;
                 player.dir = DIR_LEFT;
             }
-            if (clavier.getJoyJ1DroiteEnfoncee()) {
+            if (clavier.getJoyJ1DroiteEnfoncee() || clavier.getJoyJ1DroiteTape()) {
                 mx += 1.0;
                 player.dir = DIR_RIGHT;
             }
-            if (clavier.getJoyJ1HautEnfoncee()) {
+            if (clavier.getJoyJ1HautEnfoncee() || clavier.getJoyJ1HautTape()) {
                 my += 1.0;
                 player.dir = DIR_UP;
             }
-            if (clavier.getJoyJ1BasEnfoncee()) {
+            if (clavier.getJoyJ1BasEnfoncee() || clavier.getJoyJ1BasTape()) {
                 my -= 1.0;
                 player.dir = DIR_DOWN;
             }
