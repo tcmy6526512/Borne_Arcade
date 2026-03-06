@@ -12,7 +12,7 @@ source .venv-docs/bin/activate
 
 python -m pip install --upgrade pip setuptools wheel
 
-# Avoid building from source on i386 images.
+# Evite une compilation depuis les sources sur les images i386.
 pip install --only-binary=:all: MarkupSafe==3.0.0
 pip install -r documentations/requirements.txt
 
@@ -22,4 +22,5 @@ DOCS_PORT="${DOCS_PORT:-8000}"
 echo "Docs: http://${DOCS_HOST}:${DOCS_PORT}/"
 echo "Running: mkdocs serve -f documentations/mkdocs.yml -a ${DOCS_HOST}:${DOCS_PORT}"
 
+# Lance un serveur local de previsualisation de la documentation.
 python -m mkdocs serve -f documentations/mkdocs.yml -a "${DOCS_HOST}:${DOCS_PORT}"

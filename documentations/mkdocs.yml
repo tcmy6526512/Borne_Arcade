@@ -1,7 +1,7 @@
 site_name: Borne Arcade (IUT) — Documentation
 site_description: Documentation technique, installation, utilisateur, ajout de jeu, déploiement.
 
-# All docs live in this folder as requested.
+# Chemins relatifs pour les sources et la destination du site généré
 docs_dir: .
 site_dir: ../site
 

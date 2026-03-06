@@ -41,9 +41,9 @@ NomDuJeu.sh
 ```
 
 Exemple réel dans ce dépôt
-- Un jeu de test a été ajouté : `HelloBorne`.
-- Dossier : `projet/HelloBorne/`
-- Script : `HelloBorne.sh`
+- Un jeu de test a été ajouté : `DungeonBlitz`.
+- Dossier : `projet/DungeonBlitz/`
+- Script : `DungeonBlitz.sh`
 
 Ce script doit :
 - se lancer depuis la racine (car le menu fait `Runtime.exec("./NomDuJeu.sh")`)

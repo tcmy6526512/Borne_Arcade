@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-public class HelloBorne {
+public class DungeonBlitz {
 
     private static final int W = 1275;
     private static final int H = 1020;
@@ -37,7 +37,7 @@ public class HelloBorne {
     private static final int DIR_DOWN = 2;
     private static final int DIR_LEFT = 3;
 
-    private static final String SCORE_FILE = "projet/HelloBorne/highscore";
+    private static final String SCORE_FILE = "projet/DungeonBlitz/highscore";
 
     private static class Player {
         double x;

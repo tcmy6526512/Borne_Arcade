@@ -17,6 +17,7 @@ def read_text(path: pathlib.Path) -> str:
 
 
 def collect_docs_snapshot(docs_dir: pathlib.Path, max_files: int = 6, max_chars_per_file: int = 1400) -> str:
+    # Echantillonne quelques pages docs pour donner du contexte a l'IA.
     if not docs_dir.exists():
         return "(docs_dir introuvable)"
 
@@ -29,6 +30,7 @@ def collect_docs_snapshot(docs_dir: pathlib.Path, max_files: int = 6, max_chars_
 
 
 def call_ollama(model: str, prompt: str, host: str, timeout_s: float) -> str:
+    # Appel HTTP direct de l'API Ollama (/api/generate).
     body = json.dumps(
         {
             "model": model,
@@ -91,6 +93,7 @@ def pick_generation_model(preferred: str, available_models: list[str]) -> str:
 
 
 def call_ollama_with_iut_wrapper(model: str, prompt: str, host: str, timeout_s: float) -> str:
+    # Charge dynamiquement le wrapper pour centraliser la gestion reseau/erreurs.
     wrapper_path = os.getenv("OLLAMA_WRAPPER_PATH", "tools/ollama_wrapper_iut.py")
     path = pathlib.Path(wrapper_path)
     if not path.exists():
@@ -142,6 +145,7 @@ def main() -> int:
 
     docs_snapshot = collect_docs_snapshot(docs_dir)
 
+    # Prompt principal: impose un format de sortie actionnable pour la doc.
     prompt = textwrap.dedent(
         f"""
         Tu es un assistant documentation pour un projet de borne d'arcade.
@@ -169,6 +173,7 @@ def main() -> int:
 
     selected_model = args.model
     try:
+        # Selectionne automatiquement un modele de generation si celui demande est indisponible.
         available_models = list_models(args.host)
         fallback = pick_generation_model(selected_model, available_models)
         if fallback != selected_model:
@@ -178,6 +183,7 @@ def main() -> int:
         available_models = []
 
     try:
+        # Par defaut, le projet passe par le wrapper IUT (OLLAMA_USE_WRAPPER=1).
         if args.use_wrapper or os.getenv("OLLAMA_USE_WRAPPER", "1") == "1":
             response = call_ollama_with_iut_wrapper(selected_model, prompt, args.host, args.timeout)
         else:
@@ -198,6 +204,7 @@ def main() -> int:
         print(f"[ai-doc] Erreur Ollama, rapport d'erreur écrit: {output_path}")
         return 1
 
+    # Sortie finale: suggestions Markdown relues ensuite par un humain.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("# Suggestions IA (Ollama)\n\n" + response + "\n", encoding="utf-8")
     print(f"[ai-doc] Rapport généré: {output_path}")

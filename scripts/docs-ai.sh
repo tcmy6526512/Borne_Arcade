@@ -1,4 +1,5 @@
 #!/bin/bash
+# Il fabrique un diff Git, configure les variables Ollama, puis lance `tools/ai_doc_patch.py`.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."

@@ -13,7 +13,7 @@ Le projet est finalise sur les axes SAE demandes:
 
 ## Lot 1 - Nouveau jeu
 
-Remplacement de `HelloBorne` par un jeu complet `Dungeon Blitz`:
+Integration d'un jeu complet `Dungeon Blitz`:
 
 - gameplay top-down (deplacement, attaque, dash, nova)
 - ennemis par vagues, progression conditionnee a l'elimination complete
