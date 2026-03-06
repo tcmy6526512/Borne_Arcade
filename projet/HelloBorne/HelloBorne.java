@@ -68,6 +68,9 @@ public class HelloBorne {
         Rectangle swordPommel;
         Rectangle swordGrip;
         Rectangle swordGuard;
+        Rectangle swordPommelH;
+        Rectangle swordGripH;
+        Rectangle swordGuardH;
         Rectangle swordBladeVDark;
         Rectangle swordBladeVLight;
         Rectangle swordBladeHDark;
@@ -80,7 +83,7 @@ public class HelloBorne {
             this.dir = DIR_UP;
 
             this.hitbox = rect(0, 0, PLAYER_W, PLAYER_H, Couleur.NOIR);
-            this.capeBack = rect(0, 0, PLAYER_W + 10, 24, Couleur.ROUGE);
+            this.capeBack = rect(0, 0, PLAYER_W + 10, 24, Couleur.GRIS_FONCE);
             this.armorBase = rect(0, 0, 44, 36, Couleur.GRIS_FONCE);
             this.armorChest = rect(0, 0, 30, 24, Couleur.GRIS_CLAIR);
             this.armorShadow = rect(0, 0, 10, 24, Couleur.GRIS);
@@ -105,6 +108,9 @@ public class HelloBorne {
             this.swordPommel = rect(0, 0, 8, 6, Couleur.JAUNE);
             this.swordGrip = rect(0, 0, 8, 16, Couleur.ORANGE);
             this.swordGuard = rect(0, 0, 20, 6, Couleur.JAUNE);
+            this.swordPommelH = rect(0, 0, 6, 8, Couleur.JAUNE);
+            this.swordGripH = rect(0, 0, 16, 8, Couleur.ORANGE);
+            this.swordGuardH = rect(0, 0, 6, 20, Couleur.JAUNE);
             this.swordBladeVDark = rect(0, 0, 10, 40, Couleur.GRIS);
             this.swordBladeVLight = rect(0, 0, 4, 36, Couleur.BLANC);
             this.swordBladeHDark = rect(0, 0, 40, 10, Couleur.GRIS);
@@ -141,6 +147,9 @@ public class HelloBorne {
             swordPommel.translater(dx, dy);
             swordGrip.translater(dx, dy);
             swordGuard.translater(dx, dy);
+            swordPommelH.translater(dx, dy);
+            swordGripH.translater(dx, dy);
+            swordGuardH.translater(dx, dy);
             swordBladeVDark.translater(dx, dy);
             swordBladeVLight.translater(dx, dy);
             swordBladeHDark.translater(dx, dy);
@@ -185,6 +194,9 @@ public class HelloBorne {
                 moveTo(swordPommel, x0 + 28, y0 + 58);
                 moveTo(swordGrip, x0 + 28, y0 + 64);
                 moveTo(swordGuard, x0 + 22, y0 + 80);
+                moveTo(swordPommelH, -300, -300);
+                moveTo(swordGripH, -300, -300);
+                moveTo(swordGuardH, -300, -300);
                 moveTo(swordBladeVDark, x0 + 27, y0 + 86);
                 moveTo(swordBladeVLight, x0 + 30, y0 + 88);
                 moveTo(swordBladeHDark, -300, -300);
@@ -193,22 +205,31 @@ public class HelloBorne {
                 moveTo(swordPommel, x0 + 28, y0 + 22);
                 moveTo(swordGrip, x0 + 28, y0 + 6);
                 moveTo(swordGuard, x0 + 22, y0);
+                moveTo(swordPommelH, -300, -300);
+                moveTo(swordGripH, -300, -300);
+                moveTo(swordGuardH, -300, -300);
                 moveTo(swordBladeVDark, x0 + 27, y0 - 40);
                 moveTo(swordBladeVLight, x0 + 30, y0 - 36);
                 moveTo(swordBladeHDark, -300, -300);
                 moveTo(swordBladeHLight, -300, -300);
             } else if (dir == DIR_RIGHT) {
-                moveTo(swordPommel, x0 + 47, y0 + 35);
-                moveTo(swordGrip, x0 + 53, y0 + 31);
-                moveTo(swordGuard, x0 + 61, y0 + 31);
+                moveTo(swordPommel, -300, -300);
+                moveTo(swordGrip, -300, -300);
+                moveTo(swordGuard, -300, -300);
+                moveTo(swordPommelH, x0 + 49, y0 + 34);
+                moveTo(swordGripH, x0 + 55, y0 + 34);
+                moveTo(swordGuardH, x0 + 71, y0 + 28);
                 moveTo(swordBladeHDark, x0 + 81, y0 + 28);
                 moveTo(swordBladeHLight, x0 + 83, y0 + 31);
                 moveTo(swordBladeVDark, -300, -300);
                 moveTo(swordBladeVLight, -300, -300);
             } else {
-                moveTo(swordPommel, x0 + 5, y0 + 35);
-                moveTo(swordGrip, x0 - 3, y0 + 31);
-                moveTo(swordGuard, x0 - 19, y0 + 31);
+                moveTo(swordPommel, -300, -300);
+                moveTo(swordGrip, -300, -300);
+                moveTo(swordGuard, -300, -300);
+                moveTo(swordPommelH, x0 + 5, y0 + 34);
+                moveTo(swordGripH, x0 - 11, y0 + 34);
+                moveTo(swordGuardH, x0 - 17, y0 + 28);
                 moveTo(swordBladeHDark, x0 - 59, y0 + 28);
                 moveTo(swordBladeHLight, x0 - 55, y0 + 31);
                 moveTo(swordBladeVDark, -300, -300);
@@ -223,7 +244,9 @@ public class HelloBorne {
                 armorBase, armorChest, armorShadow, belt, buckle,
                 shoulderL, shoulderR, armL, armR, gloveL, gloveR,
                 head, helmetTop, visor, plume, eyeL, eyeR,
-                swordPommel, swordGrip, swordGuard, swordBladeVDark, swordBladeVLight, swordBladeHDark, swordBladeHLight
+                swordPommel, swordGrip, swordGuard,
+                swordPommelH, swordGripH, swordGuardH,
+                swordBladeVDark, swordBladeVLight, swordBladeHDark, swordBladeHLight
             };
         }
     }
@@ -488,7 +511,7 @@ public class HelloBorne {
         ArrayList<Obstacle> obstacles = new ArrayList<>();
         obstacles.add(new Obstacle(250, 210, 86, 76));
         obstacles.add(new Obstacle(430, 260, 92, 80));
-        obstacles.add(new Obstacle(590, 395, 90, 84));
+        obstacles.add(new Obstacle(590, 305, 90, 84));
         obstacles.add(new Obstacle(760, 280, 106, 82));
         obstacles.add(new Obstacle(940, 240, 86, 76));
         obstacles.add(new Obstacle(340, 640, 92, 80));
@@ -496,8 +519,8 @@ public class HelloBorne {
         obstacles.add(new Obstacle(760, 625, 92, 80));
         obstacles.add(new Obstacle(915, 706, 96, 82));
 
-        int startX = ARENA_LEFT + 70;
-        int startY = ARENA_BOTTOM + 70;
+        int startX = (ARENA_LEFT + ARENA_RIGHT) / 2 - PLAYER_W / 2;
+        int startY = (ARENA_BOTTOM + ARENA_TOP) / 2 - PLAYER_H / 2;
         Player player = new Player(startX, startY);
 
         Font titleFont = new Font("Calibri", Font.BOLD, 40);
@@ -513,6 +536,12 @@ public class HelloBorne {
         Texte coolTxt = new Texte(Couleur.CYAN, "Dash(B): ready | Nova(C): ready", smallFont, new Point(W / 2, 908));
         Texte helpTxt = new Texte(Couleur.GRIS_CLAIR, "J1 stick: bouger | A: epee longue | B: dash | C: nova | Z: quitter", smallFont, new Point(W / 2, 42));
         Texte infoTxt = new Texte(Couleur.JAUNE, "", hudFont, new Point(W / 2, 520));
+        Rectangle menuOverlay = rect(ARENA_LEFT, ARENA_BOTTOM, ARENA_RIGHT - ARENA_LEFT, ARENA_TOP - ARENA_BOTTOM, Couleur.NOIR);
+        Rectangle menuPanel = rect(W / 2 - 240, H / 2 - 160, 480, 260, Couleur.GRIS_FONCE);
+        Rectangle menuSelect = rect(W / 2 - 170, H / 2 - 18, 340, 56, Couleur.JAUNE);
+        Texte menuTitle = new Texte(Couleur.BLANC, "MENU", titleFont, new Point(W / 2, H / 2 + 70));
+        Texte menuPlay = new Texte(Couleur.NOIR, "JOUER", hudFont, new Point(W / 2, H / 2 + 10));
+        Texte menuQuit = new Texte(Couleur.BLANC, "QUITTER", hudFont, new Point(W / 2, H / 2 - 70));
 
         f.ajouter(bg);
         f.ajouter(arena);
@@ -542,6 +571,12 @@ public class HelloBorne {
         f.ajouter(coolTxt);
         f.ajouter(helpTxt);
         f.ajouter(infoTxt);
+        f.ajouter(menuOverlay);
+        f.ajouter(menuPanel);
+        f.ajouter(menuSelect);
+        f.ajouter(menuTitle);
+        f.ajouter(menuPlay);
+        f.ajouter(menuQuit);
 
         ArrayList<Enemy> enemies = new ArrayList<>();
         ArrayList<Fx> effects = new ArrayList<>();
@@ -558,6 +593,8 @@ public class HelloBorne {
         int hp = 6;
         int score = 0;
         boolean gameOver = false;
+        boolean inMenu = true;
+        int menuIndex = 0;
         int currentWave = 1;
         int spawnedInWave = 0;
         int enemiesTargetForWave = enemiesForWave(currentWave);
@@ -570,6 +607,61 @@ public class HelloBorne {
             }
 
             long now = System.currentTimeMillis();
+            if (inMenu) {
+                if (clavier.getJoyJ1BasTape() || clavier.getJoyJ1DroiteTape()) {
+                    menuIndex = Math.min(1, menuIndex + 1);
+                }
+                if (clavier.getJoyJ1HautTape() || clavier.getJoyJ1GaucheTape()) {
+                    menuIndex = Math.max(0, menuIndex - 1);
+                }
+
+                if (menuIndex == 0) {
+                    moveTo(menuSelect, W / 2 - 170, H / 2 - 18);
+                    menuPlay.setCouleur(Couleur.NOIR);
+                    menuQuit.setCouleur(Couleur.BLANC);
+                } else {
+                    moveTo(menuSelect, W / 2 - 170, H / 2 - 98);
+                    menuPlay.setCouleur(Couleur.BLANC);
+                    menuQuit.setCouleur(Couleur.NOIR);
+                }
+
+                if (clavier.getBoutonJ1ATape()) {
+                    if (menuIndex == 0) {
+                        inMenu = false;
+                        f.supprimer(menuOverlay);
+                        f.supprimer(menuPanel);
+                        f.supprimer(menuSelect);
+                        f.supprimer(menuTitle);
+                        f.supprimer(menuPlay);
+                        f.supprimer(menuQuit);
+
+                        hp = 6;
+                        score = 0;
+                        currentWave = 1;
+                        spawnedInWave = 0;
+                        enemiesTargetForWave = enemiesForWave(currentWave);
+                        lastSpawn = now;
+                        lastScoreTick = now;
+                        lastAttack = 0;
+                        lastDash = 0;
+                        lastNova = 0;
+                        lastHit = 0;
+                        infoTxt.setTexte("");
+                        hpTxt.setTexte("HP: 6");
+                        scoreTxt.setTexte("Score: 0");
+
+                        player.setPosition(startX, startY);
+                        player.dir = DIR_UP;
+                        player.updateVisual();
+                    } else {
+                        break;
+                    }
+                }
+
+                f.rafraichir();
+                continue;
+            }
+
             if (clavier.getBoutonJ1ZTape()) {
                 break;
             }
@@ -605,8 +697,8 @@ public class HelloBorne {
                     }
                     effects.clear();
 
-                    int resetX = ARENA_LEFT + 70;
-                    int resetY = ARENA_BOTTOM + 70;
+                    int resetX = startX;
+                    int resetY = startY;
                     player.setPosition(resetX, resetY);
                     player.dir = DIR_UP;
                     player.updateVisual();
