@@ -3,7 +3,7 @@ site_description: Documentation technique, installation, utilisateur, ajout de j
 
 # All docs live in this folder as requested.
 docs_dir: .
-site_dir: site
+site_dir: ../site
 
 theme:
   name: readthedocs

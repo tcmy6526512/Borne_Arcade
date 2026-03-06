@@ -140,5 +140,5 @@ pip install -r documentations/requirements.txt
 mkdocs build -f documentations/mkdocs.yml
 ```
 
-Le site statique est produit dans `documentations/site/`.
+Le site statique est produit dans `site/`.
 

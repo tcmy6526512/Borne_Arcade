@@ -77,5 +77,5 @@ cd ~/git/borne_arcade
 
 Livrables attendus:
 
-- site HTML dans `documentations/site/`
+- site HTML dans `site/`
 - archive finale dans `dist/`

@@ -13,4 +13,4 @@ pip install --only-binary=:all: MarkupSafe==3.0.0
 pip install -r documentations/requirements.txt
 python -m mkdocs build -f documentations/mkdocs.yml
 
-echo "Docs générées dans documentations/site/"
+echo "Docs generees dans site/"

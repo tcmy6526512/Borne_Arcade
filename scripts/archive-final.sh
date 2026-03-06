@@ -18,7 +18,7 @@ tar \
   --exclude=".git" \
   --exclude=".venv-docs" \
   --exclude="dist" \
-  --exclude="documentations/site" \
+  --exclude="site" \
   -czf "${ARCHIVE_PATH}" \
   .
 
