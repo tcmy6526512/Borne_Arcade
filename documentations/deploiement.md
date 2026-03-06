@@ -87,21 +87,15 @@ cd /chemin/vers/borne_arcade
 touch .borne-auto-deploy
 ```
 
-## Ce que devra faire le script de déploiement
+## Implémentation actuelle (livrée)
 
-- Vérifier la présence de MG2D et échouer proprement sinon.
-- Compiler menu + jeux.
-- (Optionnel) exécuter une suite de tests.
-- Redémarrer le menu.
-
-Implémentation actuelle
 - `scripts/deploy-local.sh` compile et tente de redémarrer un service systemd utilisateur `borne-arcade.service` si présent.
 - Sinon, il s'arrête après compilation.
 
-## À faire ensuite dans le code
+Les scripts de lancement/compilation utilisent désormais `scripts/env.sh` pour détecter MG2D (portable) et `NO_SHUTDOWN=1` est disponible pour les tests VM.
 
-Les scripts existants ont des chemins hardcodés vers `/home/pi/git`.
-Pour un déploiement propre, on va les refactoriser (étape suivante de la SAE) pour :
-- accepter une variable d'environnement `MG2D_HOME`
-- ou détecter MG2D à côté du dépôt (ex: `../MG2D`)
-- et éviter `sudo halt` lors des tests (VM), en mettant une option.
+## Validation borne
+
+La recette borne réelle (installation + auto-update) est documentée dans:
+
+- [Validation borne réelle](validation-borne-reelle.md)

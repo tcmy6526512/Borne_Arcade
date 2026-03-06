@@ -14,7 +14,10 @@ Commencer ici
 1. Lire [Installation](installation.md) pour installer les dépendances et exécuter le menu.
 2. Lire [Tests sur VM Ubuntu](tests-vm.md) pour reproduire un environnement de borne sur VirtualBox.
 3. Lire [Déploiement & mises à jour](deploiement.md) pour préparer l'installation “borne” + mises à jour automatiques.
+4. Lire [Validation borne réelle](validation-borne-reelle.md) pour la recette finale install + auto-update.
+5. Lire [Rapport d'avancement final](rapport-avancement-final.md) pour la synthèse de clôture.
 
 Génération de la documentation
 - Les sources sont dans `documentations/`.
 - Génération avec MkDocs : voir [Installation](installation.md#generer-la-documentation-mkdocs).
+- Archive finale : `./scripts/archive-final.sh`.
