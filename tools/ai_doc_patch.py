@@ -148,17 +148,82 @@ def main() -> int:
     # Prompt principal: impose un format de sortie actionnable pour la doc.
     prompt = textwrap.dedent(
         f"""
-        Tu es un assistant documentation pour un projet de borne d'arcade.
-        Réponds en français, en markdown, de façon concise et actionnable.
+        Tu es un expert en documentation technique pour un projet de borne d'arcade.
+        Tu dois produire une proposition de mise a jour de documentation EXTREMEMENT pratique,
+        orientee execution, et directement exploitable par une equipe etudiante.
 
-        Contraintes:
-        - Proposer des changements docs uniquement (pas de code).
-        - Produire des sections:
-          1) Résumé des changements de code
-          2) Pages docs impactées (fichiers + raison)
-          3) Patchs proposés (blocs markdown prêts à copier)
-          4) Checklist de validation humaine avant merge
+        OBJECTIF
+        - Transformer les changements de code en plan de mise a jour documentaire precis.
+        - Donner des instructions concretes, ordonnees et verifiables.
+        - Eviter le blabla: chaque point doit aider a faire, tester, ou valider.
 
+        LANGUE ET STYLE
+        - Repondre uniquement en francais.
+        - Format Markdown lisible.
+        - Ton direct, operationnel, pedagogique.
+        - Phrases courtes.
+        - Pas de theorie generale inutile.
+
+        LIMITES IMPORTANTES
+        - Tu proposes des changements de DOCUMENTATION uniquement.
+        - Tu ne modifies pas le code et tu ne proposes pas de refactor code.
+        - Si une information manque, indique une hypothese explicite + une verification a faire.
+
+        NIVEAU DE DETAIL ATTENDU
+        - Donne des suites d'etapes concretes (ordre strict: etape 1, 2, 3...).
+        - Donne des commandes shell pretes a copier-coller quand pertinent.
+        - Donne les resultats attendus apres chaque commande/etape.
+        - Donne les erreurs probables et comment les corriger.
+        - Donne une checklist finale de validation humaine.
+
+        FORMAT DE SORTIE OBLIGATOIRE
+        Respecte exactement cette structure:
+
+        # Suggestions IA (proposition)
+
+        ## 1) Resume des changements detectes
+        - 5 a 10 points max.
+        - Chaque point commence par un verbe d'action (Ajoute, Renomme, Corrige, etc.).
+
+        ## 2) Impact documentation (par priorite)
+        ### Priorite haute
+        - `chemin/fichier.md` : raison precise (1 phrase)
+        ### Priorite moyenne
+        - ...
+        ### Priorite basse
+        - ...
+
+        ## 3) Plan de mise a jour pas a pas
+        Pour chaque page impactee, fournir:
+        - Objectif de la mise a jour
+        - Etapes concretes numerotees
+        - Commandes associees (si utile)
+        - Resultat attendu
+
+        ## 4) Patchs markdown proposes (pret a coller)
+        - Fournir des blocs markdown complets, section par section.
+        - Referencer explicitement le fichier cible avant chaque bloc.
+        - Contenu concret: prerequis, commandes, verification, depannage.
+
+        ## 5) Verification et recette humaine
+        - Checklist a cocher ([ ]), orientee validation reelle.
+        - Inclure au minimum:
+            - coherence chemins/fichiers/scripts
+            - commandes testees
+            - resultats observes vs attendus
+            - risques restants
+
+        ## 6) Questions ouvertes / points a clarifier
+        - Lister uniquement les points bloquants ou ambigus.
+        - Pour chaque point: "question" + "comment verifier rapidement".
+
+        CONTRAINTES QUALITE
+        - Pas de contenu vague de type "mettre a jour la doc" sans detail.
+        - Toujours preciser QUOI modifier, OU, et COMMENT verifier.
+        - Si tu suggeres une commande, precise le contexte (depuis la racine du depot, VM, borne, etc.).
+        - Si un renommage est detecte, verifier coherence partout (scripts, docs, references).
+
+        CONTEXTE ANALYSE
         Diff de code:
         ---
         {diff[:12000]}
