@@ -1,17 +1,18 @@
-# Rapport d'avancement final (Lot 4)
+# Rapport d'avancement final (SAE)
 
 Date: 2026-03-06
 
 ## Synthese
 
-Le projet est finalise sur les axes SAE demandes:
+Le projet couvre les points demandes dans la mission SAE:
 
-- Lot 1: nouveau jeu `Dungeon Blitz` integre et jouable depuis le menu.
-- Lot 2: installation borne + auto-update industrialises via scripts + hooks + service user systemd.
-- Lot 3: documentation nettoyee, site MkDocs generable, procedure d'archive finale ajoutee.
-- Lot 4: present rapport de cloture.
+- ajout d'un nouveau jeu (`Dungeon Blitz`) integre au menu
+- automatisation de la documentation (MkDocs + suggestions IA)
+- automatisation installation/deploiement sur la borne
+- procedure de test VM et protocole de validation borne reelle
+- procedure d'archive finale pour le rendu
 
-## Lot 1 - Nouveau jeu
+## 1) Ajout d'un nouveau jeu
 
 Integration d'un jeu complet `Dungeon Blitz`:
 
@@ -21,7 +22,7 @@ Integration d'un jeu complet `Dungeon Blitz`:
 - score et best score persistants
 - menu in-game `Jouer / Quitter`
 
-## Lot 2 - Borne reelle (install + auto-update)
+## 2) Installation borne + auto-update apres pull
 
 Elements livres:
 
@@ -42,7 +43,7 @@ Recette borne detaillee dans:
 
 - `documentations/validation-borne-reelle.md`
 
-## Lot 3 - Documentation + site + archive finale
+## 3) Documentation, site MkDocs et archive finale
 
 Documentation:
 
@@ -66,6 +67,14 @@ Archive finale:
 - Validation physique finale depend de l'acces a la borne cible.
 - En cas de changement d'image OS, verifier XKB (`borne`) et session graphique user.
 - Confirmer que le service user demarre bien apres login graphique sur la borne reelle.
+
+## 4) Statut global de la mission
+
+- Documentation technique/installation/utilisateur/ajout jeu: livree
+- Tests VM: procedure livree
+- Montee de version Raspberry Pi OS: plan de migration livre
+- Installation et deploiement automatique: scripts et hooks livres
+- Validation borne reelle: checklist prete, execution physique a tracer
 
 ## Commandes de cloture
 

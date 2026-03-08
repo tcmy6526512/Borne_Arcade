@@ -1,4 +1,4 @@
-# Validation borne réelle (Lot 2)
+# Validation borne réelle
 
 Objectif: valider sur la borne physique l'installation initiale, le lancement automatique, puis l'auto-update apres `git pull`.
 

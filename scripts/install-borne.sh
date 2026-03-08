@@ -31,8 +31,8 @@ fi
 echo "[install] Installation systemd user service (menu)"
 mkdir -p ~/.config/systemd/user
 
-# Default template assumes repo is in ~/git/borne_arcade
-# If not, we generate a service with explicit paths.
+# Le template par defaut suppose un depot dans ~/git/borne_arcade.
+# Sinon, on genere un service avec des chemins explicites.
 SERVICE_PATH=~/.config/systemd/user/borne-arcade.service
 
 cat > "${SERVICE_PATH}" <<EOF

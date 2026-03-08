@@ -1,10 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
-# Resolves where MG2D is located.
+# Determine automatiquement l'emplacement de MG2D.
 #
-# Historical installs used /home/pi/git/MG2D.
-# For a portable setup, set MG2D_HOME, or keep MG2D as a sibling folder.
+# Les installations historiques utilisaient /home/pi/git/MG2D.
+# Pour un setup portable: definir MG2D_HOME ou cloner MG2D a cote du depot.
 
 if [ -n "${MG2D_HOME:-}" ] && [ -d "${MG2D_HOME}" ]; then
   export MG2D_HOME
